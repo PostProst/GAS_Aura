@@ -13,6 +13,34 @@
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+
+USTRUCT()
+struct FEffectProperties
+{
+	GENERATED_BODY()
+	
+	FEffectProperties() {}
+	
+	FGameplayEffectContextHandle EffectContextHandle;
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> TargetASC = nullptr;
+	UPROPERTY()
+	TObjectPtr<AActor> TargetAvatarActor = nullptr;
+	UPROPERTY()
+	TObjectPtr<AController> TargetController = nullptr;
+	UPROPERTY()
+	TObjectPtr<ACharacter> TargetCharacter = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> SourceASC = nullptr;
+	UPROPERTY()
+	TObjectPtr<AActor> SourceAvatarActor = nullptr;
+	UPROPERTY()
+	TObjectPtr<AController> SourceController = nullptr;
+	UPROPERTY()
+	TObjectPtr<ACharacter> SourceCharacter = nullptr;
+};
 	
 /**
  * 
@@ -27,6 +55,15 @@ public:
 	
 	// function where variables must be registered for replication
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	// Called just before any modification happens to an attribute. It affects current value.
+	// It is used when current value is modified by Duration non-periodic GE e.g. temporarily increasing MaxHealth
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	// Affects base value. Used only to clamp values 
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	
+	// Called just before a GameplayEffect is executed to modify the base value of an attribute
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category="Vital Attributes")
 	FGameplayAttributeData Health;
@@ -61,6 +98,5 @@ public:
 protected:
 
 private:
-	
-	
+	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 };
