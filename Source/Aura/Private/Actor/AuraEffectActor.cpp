@@ -38,7 +38,7 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 	// FGameplayEffectContextHandle is a wrapper for a FGameplayEffectContext
 	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(this); // an object that the effect was created from
-	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, 1.f, EffectContextHandle);
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, ActorLevel, EffectContextHandle);
 
 	/** to call ApplyGameplayEffectSpecToSelf we need a const FGameplayEffectSpec& reference
 	 *  so to get it from FGameplayEffectSpecHandle we need to get Data var from it which is a TSharedPtr
