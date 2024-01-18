@@ -26,14 +26,11 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
 }
 
-// affects current value
-void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
-{
-	Super::PreAttributeChange(Attribute, NewValue);
-	
-}
-
-// affects base value
+/* Affects BASE value, called 1st
+ * it is called on instant or duration Gameplay Effects with a period
+ * since they change the base value (potions, fire, etc.).
+ * It is not called on effects with duration/infinite with no period like a buff/debuff
+*/
 void UAuraAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
 {
 	Super::PreAttributeBaseChange(Attribute, NewValue);
@@ -50,6 +47,20 @@ void UAuraAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribu
 	}
 }
 
+/* Affects CURRENT value, called 2nd
+ * it is called in all cases, including infinite/duration GE
+ * used to clamp Max values
+ */
+void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+	
+}
+
+/* Affects BASE value, called 3rd
+ * Called just before a GameplayEffect is executed to modify the base value of an attribute
+ * as PreAttributeBaseChange it is not called on effects with duration/infinite
+ */
 void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
