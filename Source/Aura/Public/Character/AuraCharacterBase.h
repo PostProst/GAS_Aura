@@ -40,7 +40,12 @@ protected:
 	/* Initializing Primary Attributes with a Gameplay Effect */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Attributes)
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
-	void InitializePrimaryAttributes() const;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category=Attributes)
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+
+	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level = 1.f) const;
+	void InitializeDefaultAttributes() const;
 private:	
 
 	

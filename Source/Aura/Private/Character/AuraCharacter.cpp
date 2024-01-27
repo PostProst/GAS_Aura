@@ -54,6 +54,6 @@ void AAuraCharacter::InitAbilityActorInfo()
 			AuraHUD->InitOverlay(AuraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
-	/* Initialize Primary Attributes with a Gameplay Effect */
-	InitializePrimaryAttributes();
+	/* Initialize Primary and Secondary Attributes with a Gameplay Effect */
+	InitializeDefaultAttributes();
 }
