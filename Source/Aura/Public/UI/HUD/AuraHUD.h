@@ -25,7 +25,7 @@ public:
 
 	// template function for creating (if not existing) and returning any type of Widget Controller
 	template <typename T>
-	FORCEINLINE T* GetWidgetController(TObjectPtr<T> WidgetController, TSubclassOf<T> WidgetControllerClass, const FWidgetControllerParams& WCParams)
+	FORCEINLINE T* GetWidgetController(TObjectPtr<T>& WidgetController, TSubclassOf<T> WidgetControllerClass, const FWidgetControllerParams& WCParams)
 	{
 		if(WidgetController == nullptr)
 		{
