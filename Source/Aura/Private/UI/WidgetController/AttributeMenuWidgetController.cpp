@@ -5,24 +5,36 @@
 
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
-#include "AuraGameplayTags.h"
 
 void UAttributeMenuWidgetController::BroadcastInitialValues()
 {
-	UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
-
-	check(AttributeInfo)
-
-	const FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName("Attributes.Primary.Strength"));
-	if (Tag.IsValid())
+	checkf(AttributeInfo, TEXT("AttributeInfo is not set in the blueprint"))
+	
+	for (auto& Attribute : AttributeInfo->AttributeInformation)
 	{
-		FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Tag);
-		Info.AttributeValue = AS->GetStrength();
-		AttributeInfoDelegate.Broadcast(Info);
+		BroadcastAttributeInfo(Attribute.AttributeTag);
 	}
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
+	checkf(AttributeInfo, TEXT("AttributeInfo is not set in the blueprint"))
 	
+	for (auto& Attribute : AttributeInfo->AttributeInformation)
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Attribute.AttributeGetter).AddLambda(
+	[this, Attribute](const FOnAttributeChangeData& Data)
+		{
+			BroadcastAttributeInfo(Attribute.AttributeTag);
+		});
+	}
+}
+
+void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& Tag) const
+{
+	const UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
+	
+	FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Tag);
+	Info.AttributeValue = Info.AttributeGetter.GetNumericValue(AS);
+	AttributeInfoDelegate.Broadcast(Info);
 }
