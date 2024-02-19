@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AttributeSet.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "AttributeInfo.generated.h"
+
 
 USTRUCT(BlueprintType)
 struct FAuraAttributeInfo
@@ -14,16 +16,19 @@ struct FAuraAttributeInfo
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag AttributeTag = FGameplayTag();
-
-	// Text for displaying in User Widget
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText AttributeName = FText();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText AttributeDescription = FText();
-	
+
+	// set from C++ only
 	UPROPERTY(BlueprintReadOnly)
 	float AttributeValue = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayAttribute AttributeGetter = FGameplayAttribute();
 };
 
 /**
