@@ -12,6 +12,13 @@ UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tag_Attributes_Primary_Intelligence, "Attributes.
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tag_Attributes_Primary_Resilience, "Attributes.Primary.Resilience", "Increases armor and armor penetration");
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tag_Attributes_Primary_Vigor, "Attributes.Primary.Vigor", "Increases health");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_LMB, "InputTag.LMB");
+UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_RMB, "InputTag.RMB");
+UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_1, "InputTag.1");
+UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_2, "InputTag.2");
+UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_3, "InputTag.3");
+UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_4, "InputTag.4");
+
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;
 
