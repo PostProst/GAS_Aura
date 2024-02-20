@@ -16,7 +16,7 @@ class AURA_API UAuraInputComponent : public UEnhancedInputComponent
 	GENERATED_BODY()
 	
 public:
-	
+	// template for binding 3 callback functions for pressed, released and held inputs to all Input Actions
 	template <class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
 	FORCEINLINE void BindAbilityActions(const UAuraInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc)
 	{
@@ -28,11 +28,11 @@ public:
 			{
 				if (PressedFunc)
 				{
-					BindAction(Action.InputAction, ETriggerEvent::Started, Object, HeldFunc, Action.InputTag);
+					BindAction(Action.InputAction, ETriggerEvent::Started, Object, PressedFunc, Action.InputTag);
 				}
 				if (ReleasedFunc)
 				{
-					BindAction(Action.InputAction, ETriggerEvent::Completed, Object, HeldFunc, Action.InputTag);
+					BindAction(Action.InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Action.InputTag);
 				}
 				if (HeldFunc)
 				{
