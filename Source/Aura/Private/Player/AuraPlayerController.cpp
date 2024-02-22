@@ -5,20 +5,18 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/Public/Input/AuraInputComponent.h"
+#include "Components/SplineComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
 	bReplicates = true;
-}
 
-void AAuraPlayerController::PlayerTick(float DeltaTime)
-{
-	Super::PlayerTick(DeltaTime);
-
-	CursorTrace();
+	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 }
 
 void AAuraPlayerController::BeginPlay()
@@ -53,6 +51,32 @@ void AAuraPlayerController::SetupInputComponent()
 	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
+void AAuraPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+	CursorTrace();
+	AutoRun();
+}
+
+void AAuraPlayerController::AutoRun()
+{
+	if (!bAutoRunning) return;
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		// location on the Spline that is closest to the player
+		const FVector LocationOnSpline = MoveSpline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector Direction = MoveSpline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+		ControlledPawn->AddMovementInput(Direction);
+
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if (DistanceToDestination <= AutoRunAcceptanceRadius)
+		{
+			bAutoRunning = false;
+		}
+	}
+}
+
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
@@ -72,28 +96,13 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AAuraPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
-	GetHitResultUnderCursor(ECC_Vehicle, false, CursorHit);
+	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
 	// LastActor - is the actor we were hovering over last frame
 	LastActor = ThisActor;
 	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-
-	/**
-	 * Line trace from cursor. There are several scenarios:
-	 * A) LastActor is null and ThisActor is null
-	 *		- Do nothing
-	 * B) LastActor is null, ThisActor is valid
-	 *		- Highlight ThisActor
-	 * C) LastActor is valid, ThisActor is null
-	 *		- Unhighlight LastActor
-	 * D) Both actors are valid, but LastActor != ThisActor
-	 *		- Unhighlight LastActor and Highlight ThisActor
-	 * E) Both actors are valid and they are the same
-	 *		- Do nothing
-	 */
-
+	
 	// if both actors are valid and not the same we do nothing
 	// as well as if they are both null
 	if (LastActor != ThisActor)
@@ -111,19 +120,99 @@ void AAuraPlayerController::CursorTrace()
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	//GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
+	// if input is LMB (character is running)
+	if (InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
+	{
+		// if ThisActor is not null - set bTargeting to true
+		bTargeting = ThisActor ? true : false;
+		bAutoRunning = false;		
+	}
 }
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if (GetASC() == nullptr) return;
-	GetASC()->AbilityInputTagReleased(InputTag);
+	// input is not LMB - try activate ability
+	if (!InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
+	{
+		if (GetASC())
+		{
+			GetASC()->AbilityInputTagReleased(InputTag);	
+		}
+		return;
+	}
+	// if there's a target - try activate ability
+	if (bTargeting)
+	{
+		if (GetASC())
+		{
+			GetASC()->AbilityInputTagReleased(InputTag);	
+		}
+	}
+	// no target, perform click to move
+	else
+	{
+		const APawn* ControlledPawn = GetPawn();
+		// short press, not input hold
+		if (FollowTime <= ShortPressThreshold && ControlledPawn)
+		{
+			// get Navigation Path from the Character to the point under the cursor
+			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
+			{
+				MoveSpline->ClearSplinePoints();
+				// add each point from the NavigationPath to our Move Spline
+				for (auto& PointLoc : NavPath->PathPoints)
+				{
+					MoveSpline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+					//DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Red, false, 3.f);
+				}
+				// always sets the destination to the last element of the PathPoints array if it wasn't calculated properly
+				if (NavPath->PathPoints.Num() > 0)
+				{
+					CachedDestination = NavPath->PathPoints.Last();
+					bAutoRunning = true;
+				}
+			}
+		}
+		FollowTime = 0.f;
+		bTargeting = false;
+	}
 }
 
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if (GetASC() == nullptr) return;
-	GetASC()->AbilityInputTagHeld(InputTag);
+	// input is not LMB - try activate ability
+	if (!InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
+	{
+		if (GetASC())
+		{
+			GetASC()->AbilityInputTagHeld(InputTag);	
+		}
+		return;
+	}
+	// if there's a target - try activate ability
+	if (bTargeting)
+	{
+		if (GetASC())
+		{
+			GetASC()->AbilityInputTagReleased(InputTag);	
+		}
+	}
+	// no target, the Character is running
+	// AddMovementInput each frame the Input is held
+	else
+	{
+		FollowTime += GetWorld()->GetDeltaSeconds();
+		
+		if (CursorHit.bBlockingHit)
+		{
+			CachedDestination = CursorHit.ImpactPoint;
+		}
+		if (APawn* ControlledPawn = GetPawn())
+		{
+			const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(WorldDirection);
+		}
+	}
 }
 
 UAuraAbilitySystemComponent* AAuraPlayerController::GetASC()

@@ -13,6 +13,7 @@ class IEnemyInterface;
 class UAuraInputComponent;
 class UAuraInputConfig;
 class UAuraAbilitySystemComponent;
+class USplineComponent;
 
 /**
  * 
@@ -24,6 +25,7 @@ class AURA_API AAuraPlayerController : public APlayerController
 
 public:
 	AAuraPlayerController();
+	
 	virtual void PlayerTick(float DeltaTime) override;
 	
 protected:
@@ -56,11 +58,25 @@ private:
 	
 	UAuraAbilitySystemComponent* GetASC();
 	
+	FHitResult CursorHit;
 	void CursorTrace();
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
 
+	// Click to move
+	FVector CachedDestination = FVector::ZeroVector;
+	float FollowTime = 0.f;
+	float ShortPressThreshold = 0.5f;
+	bool bAutoRunning = false;
+	bool bTargeting = false;
 
+	void AutoRun();
+
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 50.f;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USplineComponent> MoveSpline;
 
 
 };
