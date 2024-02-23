@@ -145,7 +145,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	{
 		if (GetASC())
 		{
-			GetASC()->AbilityInputTagReleased(InputTag);	
+			GetASC()->AbilityInputTagReleased(InputTag);
 		}
 	}
 	// no target, perform click to move
@@ -194,7 +194,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	{
 		if (GetASC())
 		{
-			GetASC()->AbilityInputTagReleased(InputTag);	
+			GetASC()->AbilityInputTagHeld(InputTag);	
 		}
 	}
 	// no target, the Character is running
