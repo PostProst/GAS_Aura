@@ -7,14 +7,10 @@
 #include "Interaction/CombatInterface.h"
 
 
-void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
-                                           const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-                                           const FGameplayEventData* TriggerEventData)
+void UAuraProjectileSpell::SpawnProjectile()
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	// var ActivationInfo is passed in ActivateAbility by value
-	// we can then pass the address of it (&) to HasAuthority to satisfy pointer input parameter
+	// we can then pass the address of ActivationInfo (&) to HasAuthority to satisfy pointer input parameter
+	const FGameplayAbilityActivationInfo ActivationInfo = GetCurrentActivationInfo();
 	const bool bIsServer = HasAuthority(&ActivationInfo);
 	if (!bIsServer) return;
 
@@ -42,4 +38,11 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		
 		Projectile->FinishSpawning(SpawnTransform);
 	}
+}
+
+void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+                                           const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+                                           const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
