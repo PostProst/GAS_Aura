@@ -42,9 +42,16 @@ private:
 	// input actions 
 	UPROPERTY(EditDefaultsOnly, Category=Input)
 	TObjectPtr<UInputAction> MoveAction;
+
+	UPROPERTY(EditDefaultsOnly, Category=Input)
+	TObjectPtr<UInputAction> CtrlAction;
 	
 	// input callbacks
 	void Move(const FInputActionValue& InputActionValue);
+	
+	void CtrlPressed() { bCtrlKeyDown = true; };
+	void CtrlReleased() { bCtrlKeyDown = false; };
+	bool bCtrlKeyDown = false;
 
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);

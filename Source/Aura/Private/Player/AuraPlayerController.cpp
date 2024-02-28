@@ -48,6 +48,8 @@ void AAuraPlayerController::SetupInputComponent()
 	// CastChecked is an assert that halts execution of the program if it fails
 	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
 	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	AuraInputComponent->BindAction(CtrlAction, ETriggerEvent::Started, this, &AAuraPlayerController::CtrlPressed);
+	AuraInputComponent->BindAction(CtrlAction, ETriggerEvent::Completed, this, &AAuraPlayerController::CtrlReleased);
 	AuraInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
@@ -140,16 +142,14 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		}
 		return;
 	}
-	// if there's a target - try activate ability
-	if (bTargeting)
+
+	if (GetASC())
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
+		GetASC()->AbilityInputTagReleased(InputTag);
 	}
-	// no target, perform click to move
-	else
+	
+	// no target and Ctrl is not pressed - perform click to move
+	if (!bTargeting && !bCtrlKeyDown)
 	{
 		const APawn* ControlledPawn = GetPawn();
 		// short press, not input hold
@@ -189,8 +189,8 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		}
 		return;
 	}
-	// if there's a target - try activate ability
-	if (bTargeting)
+	// if there's a target or Ctrl+LMB - try activate ability
+	if (bTargeting || bCtrlKeyDown)
 	{
 		if (GetASC())
 		{
