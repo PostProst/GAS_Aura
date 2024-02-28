@@ -7,7 +7,7 @@
 #include "Interaction/CombatInterface.h"
 
 
-void UAuraProjectileSpell::SpawnProjectile()
+void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
 	// we can then pass the address of ActivationInfo (&) to HasAuthority to satisfy pointer input parameter
 	const FGameplayAbilityActivationInfo ActivationInfo = GetCurrentActivationInfo();
@@ -19,10 +19,12 @@ void UAuraProjectileSpell::SpawnProjectile()
 	{
 		// find weapon socket location of the spawned projectile
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+		FRotator ProjectileRotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		ProjectileRotation.Pitch = 0.f; // makes the Projectile parallel to the ground
 
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);
-		// TODO: set the Projectile's rotation
+		SpawnTransform.SetRotation(ProjectileRotation.Quaternion());
 
 		// SpawnActorDeferred returns a pointer to an object of a spawned class
 		// it gives an opportunity to set needed parameters on the Actor
