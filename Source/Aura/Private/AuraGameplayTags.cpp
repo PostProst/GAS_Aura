@@ -19,6 +19,8 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_2, "InputTag.2");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_3, "InputTag.3");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_4, "InputTag.4");
 
+UE_DEFINE_GAMEPLAY_TAG(Damage, "Damage");
+
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;
 
