@@ -2,6 +2,7 @@
 .vs/
 
 Content/*
+Data/*
 
 # Compiled Object files
 *.slo
