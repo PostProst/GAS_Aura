@@ -5,6 +5,7 @@
 
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
+#include "GameplayTagsManager.h"
 #include "Net/UnrealNetwork.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
@@ -78,7 +79,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
-
+	
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();
@@ -89,6 +90,12 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
 			const bool bFatal = NewHealth <= 0;
+			if (!bFatal)
+			{
+				FGameplayTagContainer Tags;
+				Tags.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact")));
+				Props.TargetASC->TryActivateAbilitiesByTag(Tags);
+			}
 		}
 	}
 }
@@ -100,8 +107,8 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	* Target = target of the effect (owner of this ASC)
 	*/
 	Props.EffectContextHandle = Data.EffectSpec.GetContext();
-	
 	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+	
 	if (IsValid(Props.SourceASC) &&
 		IsValid(Props.SourceASC->GetAvatarActor()) &&
 		Props.SourceASC->AbilityActorInfo.IsValid() &&
@@ -122,7 +129,7 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
 		}
 	}
-	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->PlayerController.IsValid())
+	if (Data.Target.AbilityActorInfo.IsValid())
 	{
 		Props.TargetAvatarActor = Data.Target.GetAvatarActor();
 		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
