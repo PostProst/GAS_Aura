@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+struct FStreamableHandle;
 class UGameplayAbility;
 class UGameplayEffect;
 class UAbilitySystemComponent;
@@ -31,6 +32,8 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
+
+	virtual void BeginDestroy() override;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -65,6 +68,26 @@ protected:
 	virtual void InitializeDefaultAttributes() const;
 
 	void AddCharacterAbilities();
+
+	/* Dissolve Effects */
+	void Dissolve();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+	
+	void LoadDissolveMaterial(TSoftObjectPtr<UMaterialInstance> MaterialInst, TSharedPtr<FStreamableHandle>& MaterialHandle, USkeletalMeshComponent* SkeletalMesh);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSoftObjectPtr<UMaterialInstance> DissolveMaterialInstance;
+	TSharedPtr<FStreamableHandle> DissolveMaterialInstanceHandle;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSoftObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+	TSharedPtr<FStreamableHandle> WeaponDissolveMaterialInstanceHandle;
+	/* end Dissolve Effects */
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Abilities")
