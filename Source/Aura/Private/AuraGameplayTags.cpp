@@ -21,6 +21,8 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_4, "InputTag.4");
 
 UE_DEFINE_GAMEPLAY_TAG(Damage, "Damage");
 
+UE_DEFINE_GAMEPLAY_TAG(Effects_HitReact, "Effects.HitReact");
+
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;
 

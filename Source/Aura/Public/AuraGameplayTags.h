@@ -34,6 +34,8 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_4);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Effects_HitReact);
+
 struct FAuraGameplayTags
 {
 public:

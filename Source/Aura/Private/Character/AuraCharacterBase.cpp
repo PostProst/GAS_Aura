@@ -70,6 +70,10 @@ void AAuraCharacterBase::AddCharacterAbilities()
 	ASC->AddCharacterAbilities(StartupAbilities);
 }
 
+UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage;
+}
 
 
 

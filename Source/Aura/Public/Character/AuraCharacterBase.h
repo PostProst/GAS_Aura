@@ -12,6 +12,7 @@ class UGameplayAbility;
 class UGameplayEffect;
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UAnimMontage;
 
 // 'Abstract' keyword means that the class is intended to be a base class for other classes
 // and is not meant to be instantiated on its own.
@@ -24,6 +25,8 @@ public:
 	AAuraCharacterBase();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -62,6 +65,9 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 
 	
 
