@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "AuraPlayerController.generated.h"
 
+class UDamageTextWidgetComponent;
 struct FInputActionValue;
 class UInputAction;
 class IEnemyInterface;
@@ -27,6 +28,9 @@ public:
 	AAuraPlayerController();
 	
 	virtual void PlayerTick(float DeltaTime) override;
+
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float Damage, ACharacter* TargetCharacter);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -39,14 +43,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category=Input)
 	TObjectPtr<class UInputMappingContext> AuraContext;
 
-	// input actions 
+	/* Input actions */ 
 	UPROPERTY(EditDefaultsOnly, Category=Input)
 	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY(EditDefaultsOnly, Category=Input)
 	TObjectPtr<UInputAction> CtrlAction;
+	/* end Input actions */ 
 	
-	// input callbacks
+	/* Input callbacks */
 	void Move(const FInputActionValue& InputActionValue);
 	
 	void CtrlPressed() { bCtrlKeyDown = true; };
@@ -56,6 +61,7 @@ private:
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
+	/* end Input callbacks */
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UAuraInputConfig> InputConfig;
@@ -70,7 +76,7 @@ private:
 	IEnemyInterface* LastActor;
 	IEnemyInterface* ThisActor;
 
-	// Click to move
+	/* Click to move */
 	FVector CachedDestination = FVector::ZeroVector;
 	float FollowTime = 0.f;
 	float ShortPressThreshold = 0.5f;
@@ -84,6 +90,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> MoveSpline;
+	/* end Click to move */
 
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UDamageTextWidgetComponent> DamageTextComponentClass;
 
 };

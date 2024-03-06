@@ -8,6 +8,7 @@
 #include "GameplayTagsManager.h"
 #include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/AuraPlayerController.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
@@ -104,6 +105,19 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 					CombatInterface->Die();
 				}
 			}
+			ShowFloatingText(Props, LocalIncomingDamage);
+		}
+	}
+}
+
+void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage) const
+{
+	// show damage text widget if not self damage
+	if (Props.SourceCharacter != Props.TargetCharacter && IsValid(Props.SourceController))
+	{
+		if (AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(Props.SourceController))
+		{
+			AuraPC->ShowDamageNumber(Damage, Props.TargetCharacter);
 		}
 	}
 }
