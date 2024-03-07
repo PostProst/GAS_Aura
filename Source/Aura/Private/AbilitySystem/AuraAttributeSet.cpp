@@ -110,14 +110,14 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	}
 }
 
-void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage) const
+void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float DamageAmount) const
 {
 	// show damage text widget if not self damage
 	if (Props.SourceCharacter != Props.TargetCharacter && IsValid(Props.SourceController))
 	{
 		if (AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(Props.SourceController))
 		{
-			AuraPC->ShowDamageNumber(Damage, Props.TargetCharacter);
+			AuraPC->ShowDamageNumber(DamageAmount, Props.TargetCharacter);
 		}
 	}
 }
