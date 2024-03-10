@@ -16,6 +16,9 @@ struct AuraDamageStatics
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Armor);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(ArmorPenetration);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(BlockChance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitChance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitDamage);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitResistance);
 	
 	AuraDamageStatics()
 	{
@@ -28,6 +31,9 @@ struct AuraDamageStatics
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, Armor, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, ArmorPenetration, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, BlockChance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitChance, Source, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitDamage, Source, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitResistance, Target, false);
 	}
 };
 
@@ -46,6 +52,9 @@ UExecCalc_Damage::UExecCalc_Damage()
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorPenetrationDef);
 	RelevantAttributesToCapture.Add(DamageStatics().BlockChanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitChanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitDamageDef);
+	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitResistanceDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -76,8 +85,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	TargetBlockChance = FMath::Max<float>(TargetBlockChance, 0.f); // Maxing the value between itself and 0, so it never becomes negative
 
 	// If there was a successful Block, if so - half the Damage
-	const float RandomNumber = FMath::FRandRange(UE_SMALL_NUMBER, 100.f);
-	if (TargetBlockChance >= RandomNumber)
+	const float RandomBlockNumber = FMath::FRandRange(UE_SMALL_NUMBER, 100.f);
+	if (TargetBlockChance >= RandomBlockNumber)
 	{
 		OutgoingDamage = OutgoingDamage * 0.5f;
 	}
@@ -109,6 +118,34 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	// Incoming damage is reduced by the EffectiveArmor percent which is scaled by EffectiveArmorCoefficient
 	OutgoingDamage *= (100 - EffectiveArmor * EffectiveArmorCoefficient) / 100.f;
+
+
+	// Critical Hit calculation
+	float SourceCritChance = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitChanceDef, EvaluationParameters, SourceCritChance);
+	SourceCritChance = FMath::Max<float>(SourceCritChance, 0.f);
+
+	float TargetCritResistance = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitResistanceDef, EvaluationParameters, TargetCritResistance);
+	TargetCritResistance = FMath::Max<float>(TargetCritResistance, 0.f);
+	
+	float SourceCritDamage = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitDamageDef, EvaluationParameters, SourceCritDamage);
+	SourceCritDamage = FMath::Max<float>(SourceCritDamage, 0.f);
+
+	// Query CriticalHitResistanceCoefficient from the Target
+	const FRealCurve* CriticalHitResistanceCurve = CharacterClassInfo->DamageCoefficients->FindCurve(FName("CriticalHitResistance"), FString());
+	const float CriticalHitResistanceCoefficient = CriticalHitResistanceCurve->Eval(TargetCombatInterface->GetPlayerLevel());
+
+	// CriticalHitChance is reduced by scaled CriticalHitResistance
+	const float EffectiveCritHitChance = SourceCritChance - TargetCritResistance * CriticalHitResistanceCoefficient;
+
+	// Critical Hit = x2 damage + CriticalHitDamage
+	const float RandomCritNumber = FMath::FRandRange(UE_SMALL_NUMBER, 100.f);
+	if (EffectiveCritHitChance >= RandomCritNumber)
+	{
+		OutgoingDamage = OutgoingDamage * 2.f + SourceCritDamage;
+	}
 
 	// OutExecutionOutput - is the outparameter struct which is used for modifying the attribute
 	const FGameplayModifierEvaluatedData EvaluatedData(UAuraAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, OutgoingDamage);
