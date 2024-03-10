@@ -5,7 +5,10 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameplayTagsManager.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "Interaction/CombatInterface.h"
 
 struct AuraDamageStatics
 {
@@ -51,8 +54,10 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
 	const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
 
-	const AActor* SourceAvatar = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
-	const AActor* TargetAvatar = TargetASC ? TargetASC->GetAvatarActor() : nullptr;
+	AActor* SourceAvatar = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
+	AActor* TargetAvatar = TargetASC ? TargetASC->GetAvatarActor() : nullptr;
+	ICombatInterface* SourceCombatInterface = Cast<ICombatInterface>(SourceAvatar);
+	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatar);
 
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 
@@ -87,10 +92,23 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().ArmorPenetrationDef, EvaluationParameters, SourceArmorPenetration);
 	SourceArmorPenetration = FMath::Max<float>(SourceArmorPenetration, 0.f);
 
-	// ArmorPenetration ignores a percentage of the Target's armor (ArmorPenetration is scaled by 0.25)
-	const float EffectiveArmor = TargetArmor * (100 - SourceArmorPenetration * 0.25f) / 100.f;
-	// Incoming damage is reduced by the EffectiveArmor percent which is scaled by 0.333
-	OutgoingDamage *= (100 - EffectiveArmor * 0.333) / 100.f;
+	// Query DamageCoefficients from the CharacterClass DataAsset to use in damage calculations
+	const UCharacterClassInfo* CharacterClassInfo = UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatar);
+
+	// Query ArmorPenetration coefficient from the Source
+	const FRealCurve* ArmorPenetrationCurve = CharacterClassInfo->DamageCoefficients->FindCurve(FName("ArmorPenetration"), FString());
+	// finds a value on the curve at a specified level
+	const float ArmorPenCoefficient = ArmorPenetrationCurve->Eval(SourceCombatInterface->GetPlayerLevel());
+
+	// ArmorPenetration ignores a percentage of the Target's armor (ArmorPenetration is scaled by ArmorPenCoefficient)
+	const float EffectiveArmor = TargetArmor * (100 - SourceArmorPenetration * ArmorPenCoefficient) / 100.f;
+
+	// Query EffectiveArmorCoefficient from the Target
+	const FRealCurve* EffectiveArmorCurve = CharacterClassInfo->DamageCoefficients->FindCurve(FName("EffectiveArmor"), FString());
+	const float EffectiveArmorCoefficient = EffectiveArmorCurve->Eval(TargetCombatInterface->GetPlayerLevel());
+	
+	// Incoming damage is reduced by the EffectiveArmor percent which is scaled by EffectiveArmorCoefficient
+	OutgoingDamage *= (100 - EffectiveArmor * EffectiveArmorCoefficient) / 100.f;
 
 	// OutExecutionOutput - is the outparameter struct which is used for modifying the attribute
 	const FGameplayModifierEvaluatedData EvaluatedData(UAuraAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, OutgoingDamage);
