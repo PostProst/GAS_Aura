@@ -63,7 +63,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvaluationParameters.TargetTags = TargetTags;
 
 	// Get Damage Set by Caller Magnitude
-	float Damage = Spec.GetSetByCallerMagnitude(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage")));
+	float OutgoingDamage = Spec.GetSetByCallerMagnitude(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage")));
 
 	// Capture BlockChance from the Target
 	float TargetBlockChance = 0.f;
@@ -74,7 +74,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const float RandomNumber = FMath::FRandRange(UE_SMALL_NUMBER, 100.f);
 	if (TargetBlockChance >= RandomNumber)
 	{
-		Damage = Damage * 0.5f;
+		OutgoingDamage = OutgoingDamage * 0.5f;
 	}
 	
 	// Capture Armor from the Target
@@ -90,9 +90,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// ArmorPenetration ignores a percentage of the Target's armor (ArmorPenetration is scaled by 0.25)
 	const float EffectiveArmor = TargetArmor * (100 - SourceArmorPenetration * 0.25f) / 100.f;
 	// Incoming damage is reduced by the EffectiveArmor percent which is scaled by 0.333
-	Damage *= (100 - EffectiveArmor * 0.333) / 100.f;
+	OutgoingDamage *= (100 - EffectiveArmor * 0.333) / 100.f;
 
 	// OutExecutionOutput - is the outparameter struct which is used for modifying the attribute
-	const FGameplayModifierEvaluatedData EvaluatedData(UAuraAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
+	const FGameplayModifierEvaluatedData EvaluatedData(UAuraAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, OutgoingDamage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
 }
