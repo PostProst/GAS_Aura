@@ -4,6 +4,7 @@
 #include "AbilitySystem/ExecCalc/ExecCalc_Damage.h"
 
 #include "AbilitySystemComponent.h"
+#include "AuraAbilitySystemTypes.h"
 #include "GameplayTagsManager.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
@@ -69,6 +70,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatar);
 
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 
 	FAggregatorEvaluateParameters EvaluationParameters;
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
@@ -88,6 +90,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const float RandomBlockNumber = FMath::FRandRange(UE_SMALL_NUMBER, 100.f);
 	if (TargetBlockChance >= RandomBlockNumber)
 	{
+		UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, true);
 		OutgoingDamage = OutgoingDamage * 0.5f;
 	}
 	
@@ -144,6 +147,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const float RandomCritNumber = FMath::FRandRange(UE_SMALL_NUMBER, 100.f);
 	if (EffectiveCritHitChance >= RandomCritNumber)
 	{
+		UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, true);
 		OutgoingDamage = OutgoingDamage * 2.f + SourceCritDamage;
 	}
 
