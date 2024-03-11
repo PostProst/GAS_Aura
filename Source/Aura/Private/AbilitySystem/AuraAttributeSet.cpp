@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
 #include "GameplayTagsManager.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/AuraPlayerController.h"
@@ -105,19 +106,22 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 					CombatInterface->Die();
 				}
 			}
-			ShowFloatingText(Props, LocalIncomingDamage);
+			const bool bBlock = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+			const bool bCrit = UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+			
+			ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCrit);
 		}
 	}
 }
 
-void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float DamageAmount) const
+void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float DamageAmount, bool bBlockedHit, bool bCriticalHit) const
 {
 	// show damage text widget if not self damage
 	if (Props.SourceCharacter != Props.TargetCharacter && IsValid(Props.SourceController))
 	{
 		if (AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(Props.SourceController))
 		{
-			AuraPC->ShowDamageNumber(DamageAmount, Props.TargetCharacter);
+			AuraPC->ShowDamageNumber(DamageAmount, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}
 	}
 }
