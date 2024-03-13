@@ -12,6 +12,11 @@ UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tag_Attributes_Primary_Intelligence, "Attributes.
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tag_Attributes_Primary_Resilience, "Attributes.Primary.Resilience", "Increases armor and armor penetration");
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(Tag_Attributes_Primary_Vigor, "Attributes.Primary.Vigor", "Increases health");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Attributes_Resistance_Fire, "Attributes.Resistance.Fire");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Attributes_Resistance_Lightning, "Attributes.Resistance.Lightning");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Attributes_Resistance_Arcane, "Attributes.Resistance.Arcane");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Attributes_Resistance_Physical, "Attributes.Resistance.Physical");
+
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_LMB, "InputTag.LMB");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_RMB, "InputTag.RMB");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_1, "InputTag.1");
@@ -19,10 +24,13 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_2, "InputTag.2");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_3, "InputTag.3");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_4, "InputTag.4");
 
-UE_DEFINE_GAMEPLAY_TAG(Damage, "Damage");
-UE_DEFINE_GAMEPLAY_TAG(Damage_Fire, "Damage.Fire");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Damage, "Damage");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Fire, "Damage.Fire");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Lightning, "Damage.Lightning");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Arcane, "Damage.Arcane");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Physical, "Damage.Physical");
 
-UE_DEFINE_GAMEPLAY_TAG(Effects_HitReact, "Effects.HitReact");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;
@@ -45,5 +53,9 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Secondary_MaxHealth = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxHealth"), FString("Maximum amount of Health obtainable"));
 	GameplayTags.Attributes_Secondary_MaxMana = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxMana"), FString("Maximum amount of Mana obtainable"));
 
-	GameplayTags.DamageTypes.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Fire")));
+	// Map Damage Types to Resistances
+	GameplayTags.DamageTypesToResistances.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Fire")), UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Fire")));
+	GameplayTags.DamageTypesToResistances.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Lightning")), UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Lightning")));
+	GameplayTags.DamageTypesToResistances.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Arcane")), UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Arcane")));
+	GameplayTags.DamageTypesToResistances.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Physical")), UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Physical")));
 }

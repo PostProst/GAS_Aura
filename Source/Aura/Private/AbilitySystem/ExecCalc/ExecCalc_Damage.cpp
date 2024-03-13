@@ -80,13 +80,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvaluationParameters.TargetTags = TargetTags;
 
 	// Local Damage variable
-	float OutgoingDamage = 0.f;
+	float Damage = 0.f;
 	// Loop through all DamageTypes defined in FAuraGameplayTags singleton
-	// and add its value corresponding to its Tag (if there's any) to the local OutgoingDamage var 
-	for (FGameplayTag DamageTypeTag : FAuraGameplayTags::Get().DamageTypes)
+	// and add its value corresponding to its Tag (if there's any) to the local Damage var 
+	for (const auto& Pair : FAuraGameplayTags::Get().DamageTypesToResistances)
 	{
-		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag);
-		OutgoingDamage += DamageTypeValue;
+		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key);
+		Damage += DamageTypeValue;
 	}
 	
 	// Capture BlockChance from the Target
@@ -99,7 +99,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	if (TargetBlockChance >= RandomBlockNumber)
 	{
 		UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, true);
-		OutgoingDamage = OutgoingDamage * 0.5f;
+		Damage = Damage * 0.5f;
 	}
 	
 	// Capture Armor from the Target
@@ -128,7 +128,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const float EffectiveArmorCoefficient = EffectiveArmorCurve->Eval(TargetCombatInterface->GetPlayerLevel());
 	
 	// Incoming damage is reduced by the EffectiveArmor percent which is scaled by EffectiveArmorCoefficient
-	OutgoingDamage *= (100 - EffectiveArmor * EffectiveArmorCoefficient) / 100.f;
+	Damage *= (100 - EffectiveArmor * EffectiveArmorCoefficient) / 100.f;
 
 
 	// Critical Hit calculation
@@ -156,10 +156,10 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	if (EffectiveCritHitChance >= RandomCritNumber)
 	{
 		UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, true);
-		OutgoingDamage = OutgoingDamage * 2.f + SourceCritDamage;
+		Damage = Damage * 2.f + SourceCritDamage;
 	}
 
 	// OutExecutionOutput - is the outparameter struct which is used for modifying the attribute
-	const FGameplayModifierEvaluatedData EvaluatedData(UAuraAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, OutgoingDamage);
+	const FGameplayModifierEvaluatedData EvaluatedData(UAuraAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
 }

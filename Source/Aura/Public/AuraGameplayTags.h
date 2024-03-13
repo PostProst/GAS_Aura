@@ -25,6 +25,11 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Primary_Intelligence);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Primary_Resilience);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Primary_Vigor);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Fire);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Lightning);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Arcane);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Physical);
+
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_LMB);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_RMB);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_1);
@@ -32,10 +37,13 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_2);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_3);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_4);
 
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage_Fire);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Fire);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Lightning);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Arcane);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Physical);
 
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(Effects_HitReact);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Effects_HitReact);
 
 struct FAuraGameplayTags
 {
@@ -54,7 +62,7 @@ public:
  FGameplayTag Attributes_Secondary_MaxHealth;
  FGameplayTag Attributes_Secondary_MaxMana;
 
- TArray<FGameplayTag> DamageTypes;
+ TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
  
 protected:
  
