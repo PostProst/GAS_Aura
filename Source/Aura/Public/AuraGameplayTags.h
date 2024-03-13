@@ -33,6 +33,7 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_3);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_4);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage_Fire);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Effects_HitReact);
 
@@ -52,6 +53,8 @@ public:
  FGameplayTag Attributes_Secondary_ManaRegeneration;
  FGameplayTag Attributes_Secondary_MaxHealth;
  FGameplayTag Attributes_Secondary_MaxMana;
+
+ TArray<FGameplayTag> DamageTypes;
  
 protected:
  

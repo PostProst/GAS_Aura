@@ -20,6 +20,7 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_3, "InputTag.3");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_4, "InputTag.4");
 
 UE_DEFINE_GAMEPLAY_TAG(Damage, "Damage");
+UE_DEFINE_GAMEPLAY_TAG(Damage_Fire, "Damage.Fire");
 
 UE_DEFINE_GAMEPLAY_TAG(Effects_HitReact, "Effects.HitReact");
 
@@ -43,5 +44,6 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Secondary_ManaRegeneration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.ManaRegeneration"), FString("Amount of Mana regenerated every 1 second"));
 	GameplayTags.Attributes_Secondary_MaxHealth = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxHealth"), FString("Maximum amount of Health obtainable"));
 	GameplayTags.Attributes_Secondary_MaxMana = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxMana"), FString("Maximum amount of Mana obtainable"));
-	
+
+	GameplayTags.DamageTypes.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Fire")));
 }
