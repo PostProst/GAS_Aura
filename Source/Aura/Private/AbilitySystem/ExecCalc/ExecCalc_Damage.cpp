@@ -21,6 +21,12 @@ struct AuraDamageStatics
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitChance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitDamage);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(FireResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(LightningResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(ArcaneResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(PhysicalResistance);
+
+	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefs;
 	
 	AuraDamageStatics()
 	{
@@ -36,11 +42,27 @@ struct AuraDamageStatics
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitChance, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitDamage, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CriticalHitResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, FireResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, LightningResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, ArcaneResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, PhysicalResistance, Target, false);
+
+		// Map Attribute Gameplay Tags to Attribute Capture Definitions
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Secondary.Armor")), ArmorDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Secondary.ArmorPenetration")), ArmorPenetrationDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Secondary.BlockChance")), BlockChanceDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Secondary.CriticalHitChance")), CriticalHitChanceDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Secondary.CriticalHitDamage")), CriticalHitDamageDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Secondary.CriticalHitResistance")), CriticalHitResistanceDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Fire")), FireResistanceDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Lightning")), LightningResistanceDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Arcane")), ArcaneResistanceDef);
+		TagsToCaptureDefs.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Physical")), PhysicalResistanceDef);
 	}
 };
 
 // static func to create return static AuraDamageStatics struct
-static const AuraDamageStatics& DamageStatics()
+static const AuraDamageStatics& GetDamageStatics()
 {
 	// static member variables declared in a static func will always return the same object
 	static AuraDamageStatics Dstatics;
@@ -51,12 +73,16 @@ static const AuraDamageStatics& DamageStatics()
 UExecCalc_Damage::UExecCalc_Damage()
 {
 	// Add the AttributeCaptureDefinition we created to the array of AttributesToCapture
-	RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
-	RelevantAttributesToCapture.Add(DamageStatics().ArmorPenetrationDef);
-	RelevantAttributesToCapture.Add(DamageStatics().BlockChanceDef);
-	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitChanceDef);
-	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitDamageDef);
-	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitResistanceDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().ArmorDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().ArmorPenetrationDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().BlockChanceDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().CriticalHitChanceDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().CriticalHitDamageDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().CriticalHitResistanceDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().FireResistanceDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().LightningResistanceDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().ArcaneResistanceDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().PhysicalResistanceDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -81,17 +107,36 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	// Local Damage variable
 	float Damage = 0.f;
-	// Loop through all DamageTypes defined in FAuraGameplayTags singleton
-	// and add its value corresponding to its Tag (if there's any) to the local Damage var 
+	
+	// Loop through DamageTypesToResistances Tag Map defined in FAuraGameplayTags singleton
 	for (const auto& Pair : FAuraGameplayTags::Get().DamageTypesToResistances)
 	{
-		const float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key);
+		const FGameplayTag DamageTypeTag = Pair.Key;
+		const FGameplayTag ResistanceTag = Pair.Value;
+
+		checkf(GetDamageStatics().TagsToCaptureDefs.Contains(ResistanceTag), TEXT("TagsToCaptureDefs Map doesn't contain Tag: %s in ExecCalc_Damage"), *ResistanceTag.ToString());
+
+		// Find Attribute Capture Definition corresponding to the Resistance Tag
+		const FGameplayEffectAttributeCaptureDefinition CaptureDef = GetDamageStatics().TagsToCaptureDefs[ResistanceTag];
+
+		// Get the damage associated with the Damage Type Tag from the AbilitySpec
+		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag, false);
+
+		// Capture Resistance Attribute Magnitude
+		float Resistance = 0.f;
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvaluationParameters, Resistance);
+		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);
+
+		// Reduce the DamageTypeValue by Resistance percent
+		DamageTypeValue *= (100.f - Resistance) / 100.f;
+
+		// Set the total damage value
 		Damage += DamageTypeValue;
 	}
 	
 	// Capture BlockChance from the Target
 	float TargetBlockChance = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().BlockChanceDef, EvaluationParameters, TargetBlockChance);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().BlockChanceDef, EvaluationParameters, TargetBlockChance);
 	TargetBlockChance = FMath::Max<float>(TargetBlockChance, 0.f); // Maxing the value between itself and 0, so it never becomes negative
 
 	// If there was a successful Block, if so - half the Damage
@@ -104,12 +149,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	// Capture Armor from the Target
 	float TargetArmor = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().ArmorDef, EvaluationParameters, TargetArmor);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().ArmorDef, EvaluationParameters, TargetArmor);
 	TargetArmor = FMath::Max<float>(TargetArmor, 0.f);
 
 	// Capture Armor Penetration from the Source
 	float SourceArmorPenetration = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().ArmorPenetrationDef, EvaluationParameters, SourceArmorPenetration);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().ArmorPenetrationDef, EvaluationParameters, SourceArmorPenetration);
 	SourceArmorPenetration = FMath::Max<float>(SourceArmorPenetration, 0.f);
 
 	// Query DamageCoefficients from the CharacterClass DataAsset to use in damage calculations
@@ -133,15 +178,15 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	// Critical Hit calculation
 	float SourceCritChance = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitChanceDef, EvaluationParameters, SourceCritChance);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().CriticalHitChanceDef, EvaluationParameters, SourceCritChance);
 	SourceCritChance = FMath::Max<float>(SourceCritChance, 0.f);
 
 	float TargetCritResistance = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitResistanceDef, EvaluationParameters, TargetCritResistance);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().CriticalHitResistanceDef, EvaluationParameters, TargetCritResistance);
 	TargetCritResistance = FMath::Max<float>(TargetCritResistance, 0.f);
 	
 	float SourceCritDamage = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitDamageDef, EvaluationParameters, SourceCritDamage);
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().CriticalHitDamageDef, EvaluationParameters, SourceCritDamage);
 	SourceCritDamage = FMath::Max<float>(SourceCritDamage, 0.f);
 
 	// Query CriticalHitResistanceCoefficient from the Target
