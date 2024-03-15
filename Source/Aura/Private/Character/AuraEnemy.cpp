@@ -44,6 +44,10 @@ void AAuraEnemy::PossessedBy(AController* NewController)
 	// Initialize Blackboard and Run the Behaviour tree
 	AuraAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
 	AuraAIController->RunBehaviorTree(BehaviorTree);
+	// Set Blackboard keys
+	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("bHitReacting"), false);
+	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsRangedAttacker"), CharacterClass != ECharacterClass::Warrior);
+
 }
 
 void AAuraEnemy::BeginPlay()
@@ -91,7 +95,12 @@ void AAuraEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCou
 	bHitReacting = NewCount > 0;
 
 	// if HitReact tag is added - the character cannot move
-	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	if(HasAuthority())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+		AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("bHitReacting"), bHitReacting);
+	}
+	
 }
 
 void AAuraEnemy::InitAbilityActorInfo()
