@@ -43,6 +43,8 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Physical, "Damage.Physical");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Attack, "Abilities.Attack");
+
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;
 

@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AuraAbilitySystemTypes.h"
 #include "Game/AuraGameModeBase.h"
+#include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/WidgetController/AuraWidgetController.h"
@@ -81,16 +82,27 @@ void UAuraAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* World
 	
 }
 
-void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext, UAbilitySystemComponent* ASC)
+void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
 {
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContext);
 	if (ASC == nullptr || CharacterClassInfo == nullptr) return;
 
-	// give all Abilities from CommonAbilities array to the character
+	// give common abilities to the character
 	for (auto const Ability : CharacterClassInfo->CommonAbilities)
 	{
 		const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability);
 		ASC->GiveAbility(AbilitySpec);
+	}
+	// give abilities specific to the given character class
+	const FCharacterClassDefaultInfo& DefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+	for (auto const Ability : DefaultInfo.StartupAbilities)
+	{
+		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ASC->GetAvatarActor()))
+		{
+			const float CharacterLevel = CombatInterface->GetPlayerLevel();
+			const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability, CharacterLevel);
+			ASC->GiveAbility(AbilitySpec);	
+		}
 	}
 }
 

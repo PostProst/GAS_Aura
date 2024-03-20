@@ -56,6 +56,8 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Physical);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Effects_HitReact);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Attack);
+
 struct FAuraGameplayTags
 {
 public:
