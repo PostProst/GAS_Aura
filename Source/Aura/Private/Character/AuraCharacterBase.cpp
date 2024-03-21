@@ -50,7 +50,7 @@ void AAuraCharacterBase::BeginPlay()
 	
 }
 
-FVector AAuraCharacterBase::GetCombatSocketLocation()
+FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation()
 {
 	check(WeaponMesh);
 	return WeaponMesh->GetSocketLocation(WeaponTipSocketName);

@@ -23,9 +23,12 @@ class AURA_API ICombatInterface
 	
 public:
 	virtual int32 GetPlayerLevel();
-	virtual FVector GetCombatSocketLocation();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetCombatSocketLocation();
 
-	// BlueprintImplementableEvent functions must not be virtual
+	// BlueprintImplementableEvent and BlueprintNativeEvent functions must not be virtual
+	// but when overriden in C++ must be marked as 'virtual FuncName_Implementation() override' in both .h and .cpp
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);
 	
