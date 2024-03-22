@@ -96,14 +96,12 @@ void AAuraEnemy::BeginPlay()
 void AAuraEnemy::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
-
 	// if HitReact tag is added - the character cannot move
-	if(HasAuthority())
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	if(AuraAIController && AuraAIController->GetBlackboardComponent())
 	{
-		GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
 		AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("bHitReacting"), bHitReacting);
 	}
-	
 }
 
 void AAuraEnemy::InitAbilityActorInfo()
