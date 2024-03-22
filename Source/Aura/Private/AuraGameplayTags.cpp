@@ -45,6 +45,10 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Attack, "Abilities.Attack");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_Weapon, "Montage.Attack.Weapon");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_RightHand, "Montage.Attack.RightHand");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_LeftHand, "Montage.Attack.LeftHand");
+
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;
 

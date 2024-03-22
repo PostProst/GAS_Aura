@@ -58,6 +58,10 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Effects_HitReact);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Attack);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Montage_Attack_Weapon);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Montage_Attack_RightHand);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Montage_Attack_LeftHand);
+
 struct FAuraGameplayTags
 {
 public:
