@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "GameplayTagsManager.h"
 #include "Actor/AuraProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -18,7 +19,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 
 	// if an avatar actor inherits from ICombatInterface
 	// find weapon socket location of the spawned projectile
-	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo());
+	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), UGameplayTagsManager::Get().RequestGameplayTag(FName("Montage.Attack.Weapon")));
 	FRotator ProjectileRotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 	ProjectileRotation.Pitch = 0.f; // makes the Projectile parallel to the ground
 
