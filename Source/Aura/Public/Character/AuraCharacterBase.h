@@ -48,7 +48,7 @@ protected:
 	virtual void BeginPlay() override;
 	bool bDead = false;
 
-	UPROPERTY(EditDefaultsOnly, Category=Combat)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Combat)
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 
 	UPROPERTY(EditDefaultsOnly, Category=Combat)
