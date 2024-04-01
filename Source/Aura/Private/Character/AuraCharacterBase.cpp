@@ -160,6 +160,16 @@ TArray<FTaggedMontage> AAuraCharacterBase::GetAttackMontages_Implementation()
 	return AttackMontages;
 }
 
+UNiagaraSystem* AAuraCharacterBase::GetBloodEffect_Implementation()
+{
+	if (BloodEffect)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("BloodEffect os ok"));
+	}
+	
+	return BloodEffect;	
+}
+
 void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 {
 	bDead = true;
