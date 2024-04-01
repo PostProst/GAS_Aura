@@ -45,9 +45,14 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Attack, "Abilities.Attack");
 
-UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_Weapon, "Montage.Attack.Weapon");
-UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_RightHand, "Montage.Attack.RightHand");
-UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_LeftHand, "Montage.Attack.LeftHand");
+UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_Weapon, "CombatSocket.Weapon");
+UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_RightHand, "CombatSocket.RightHand");
+UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_LeftHand, "CombatSocket.LeftHand");
+
+UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_1, "Montage.Attack.1");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_2, "Montage.Attack.2");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_3, "Montage.Attack.3");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_4, "Montage.Attack.4");
 
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;

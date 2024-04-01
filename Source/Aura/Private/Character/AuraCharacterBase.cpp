@@ -3,7 +3,6 @@
 
 #include "Character/AuraCharacterBase.h"
 #include "AbilitySystemComponent.h"
-#include "GameplayTagsManager.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
@@ -54,16 +53,16 @@ void AAuraCharacterBase::BeginPlay()
 // return SocketLocation depending on the Montage Tag
 FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
-	if(MontageTag.MatchesTagExact(UGameplayTagsManager::Get().RequestGameplayTag(FName("Montage.Attack.Weapon"))))
+	if(MontageTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("CombatSocket.Weapon"))))
 	{
 		check(WeaponMesh);
         return WeaponMesh->GetSocketLocation(WeaponTipSocketName);
 	}
-	if(MontageTag.MatchesTagExact(UGameplayTagsManager::Get().RequestGameplayTag(FName("Montage.Attack.RightHand"))))
+	if(MontageTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("CombatSocket.RightHand"))))
 	{
 		return GetMesh()->GetSocketLocation(RightHandSocketName);
 	}
-	if(MontageTag.MatchesTagExact(UGameplayTagsManager::Get().RequestGameplayTag(FName("Montage.Attack.LeftHand"))))
+	if(MontageTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("CombatSocket.LeftHand"))))
 	{
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);
 	}
