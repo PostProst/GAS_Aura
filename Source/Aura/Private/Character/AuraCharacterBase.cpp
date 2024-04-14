@@ -67,6 +67,10 @@ FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGamepl
 	{
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);
 	}
+	if(MontageTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("CombatSocket.Tail"))))
+	{
+		return GetMesh()->GetSocketLocation(TailSocketName);
+	}
 	return FVector();
 }
 
@@ -111,7 +115,7 @@ void AAuraCharacterBase::LoadDissolveMaterial(TSoftObjectPtr<UMaterialInstance> 
 	TSharedPtr<FStreamableHandle>& MaterialHandle, USkeletalMeshComponent* SkeletalMesh)
 {
 	// RequestAsyncLoad takes a TSoftObjectPtr to load (also need to call .ToSoftObjectPath()) and a callback which is called when the asset is loaded
-	// RequestAsyncLoad returns a FStreamableHandle where we store the asset in a global var so we can later free the memory manually (in BeginDestroy)
+	// RequestAsyncLoad returns a FStreamableHandle where we store the asset in a global var, so we can later free the memory manually (in BeginDestroy)
 	MaterialHandle = UAssetManager::GetStreamableManager().RequestAsyncLoad(
 	MaterialInst.ToSoftObjectPath(),
 	FStreamableDelegate::CreateLambda(

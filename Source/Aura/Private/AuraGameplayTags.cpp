@@ -48,6 +48,7 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Attack, "Abilities.Attack");
 UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_Weapon, "CombatSocket.Weapon");
 UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_RightHand, "CombatSocket.RightHand");
 UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_LeftHand, "CombatSocket.LeftHand");
+UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_Tail, "CombatSocket.Tail");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_1, "Montage.Attack.1");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_2, "Montage.Attack.2");

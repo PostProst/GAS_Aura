@@ -60,6 +60,8 @@ protected:
 	FName RightHandSocketName;
 	UPROPERTY(EditDefaultsOnly, Category=Combat)
 	FName LeftHandSocketName;
+	UPROPERTY(EditDefaultsOnly, Category=Combat)
+	FName TailSocketName;
 	
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
