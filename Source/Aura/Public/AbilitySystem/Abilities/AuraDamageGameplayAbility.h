@@ -20,6 +20,10 @@ public:
 
 protected:
 
+	// sets a flag on the Mesh to correctly update bone positions on the server when playing AnimMontages
+	UFUNCTION(BlueprintCallable)
+	void SetVisibilityBasedAnimTickOption(EVisibilityBasedAnimTickOption Option);
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Damage")
 	TMap<FGameplayTag, FScalableFloat> DamageTypes;
 	
