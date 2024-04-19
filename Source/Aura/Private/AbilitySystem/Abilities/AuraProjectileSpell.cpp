@@ -9,7 +9,7 @@
 #include "Interaction/CombatInterface.h"
 
 
-void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag)
+void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePith)
 {
 	// we can then pass the address of ActivationInfo (&) to HasAuthority to satisfy pointer input parameter
 	const FGameplayAbilityActivationInfo ActivationInfo = GetCurrentActivationInfo();
@@ -20,7 +20,9 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 	// find weapon socket location of the spawned projectile
 	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 	FRotator ProjectileRotation = (ProjectileTargetLocation - SocketLocation).Rotation();
-	ProjectileRotation.Pitch = 0.f; // makes the Projectile parallel to the ground
+
+	// makes the Projectile parallel to the ground
+	bOverridePith ? ProjectileRotation.Pitch = 0.f : ProjectileRotation.Pitch;
 
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(SocketLocation);
