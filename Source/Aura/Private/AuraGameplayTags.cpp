@@ -45,6 +45,7 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Attack, "Abilities.Attack");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Summon, "Abilities.Summon");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Fire_FireBolt, "Abilities.Fire.FireBolt");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_Weapon, "CombatSocket.Weapon");
 UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_RightHand, "CombatSocket.RightHand");
