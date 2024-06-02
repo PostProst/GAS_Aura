@@ -4,6 +4,7 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/AuraAttributeSet.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -48,29 +49,57 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 				OnMaxManaChanged.Broadcast(Data.NewValue);
 			}
 		);
-	
-	/* EffectAssetTags delegate is broadcast in Aura ASC when any Effect is applied
-	 * here we bind Lambda callback to this delegate to check all Tags gained from the applied Effect and find Message Tags
-	 * then we broadcast our MessageWidgetRowDelegate where we search our Data Table (defined in BP) for the required Tag by name
-	 * to show the message and other related info in WBP_EffectMessage
-	 * (the callback for MessageWidgetRowDelegate is assigned and defined in WBP_Overlay)
-	 */
-	Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
-	[this](const FGameplayTagContainer& AssetTags)
+
+	if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent))
 	{
-		for (const auto& Tag : AssetTags)
+		// Binding a callback for a AbilitiesGivenDelegate, broadcast when abilities are given on startup if they weren't given yet
+		if (!AuraASC->bStartupAbilitiesGiven)
 		{
-			/* for example: Tag = Message.HealthPotion
-			 * "Message.HealthPotion".MatchesTag("Message") will return True, "Message".MatchesTag("Message.HealthPotion") will return False */
-			
-			FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
-			if (Tag.MatchesTag(MessageTag))
-			{
-				const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
-				MessageWidgetRowDelegate.Broadcast(*Row);				
-			}
+			AuraASC->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnInitializeStartupAbilities);
 		}
+		// call the callback directly if the abilities were already given
+		else
+		{
+			OnInitializeStartupAbilities(AuraASC);
+		}
+		
+		/* EffectAssetTagsDelegate is broadcast in Aura ASC when any Effect is applied
+         * here we bind Lambda callback to this delegate to check all Tags gained from the applied Effect and find Message Tags
+         * then we broadcast our MessageWidgetRowDelegate where we search our Data Table (defined in BP) for the required Tag by name
+         * to show the message and other related info in WBP_EffectMessage
+         * (the callback for MessageWidgetRowDelegate is assigned and defined in WBP_Overlay)
+         */
+        AuraASC->EffectAssetTagsDelegate.AddLambda(
+        [this](const FGameplayTagContainer& AssetTags)
+	        {
+        		for (const auto& Tag : AssetTags)
+        		{
+        			/* for example: Tag = Message.HealthPotion
+        			 * "Message.HealthPotion".MatchesTag("Message") will return True, "Message".MatchesTag("Message.HealthPotion") will return False */
+        			
+        			FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+        			if (Tag.MatchesTag(MessageTag))
+        			{
+        				const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
+        				MessageWidgetRowDelegate.Broadcast(*Row);				
+        			}
+        		}
+	        }
+        );
 	}
-	);
+}
+
+void UOverlayWidgetController::OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent)
+{
+	if (!AuraAbilitySystemComponent->bStartupAbilitiesGiven) return;
+	
+	FForEachAbility BroadcastDelegate;
+	BroadcastDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
+	{
+		FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(UAuraAbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
+		Info.InputTag = UAuraAbilitySystemComponent::GetInputTagFromSpec(AbilitySpec);
+		AbilityInfoDelegate.Broadcast(Info);
+	});
+	AuraAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
 }
 
