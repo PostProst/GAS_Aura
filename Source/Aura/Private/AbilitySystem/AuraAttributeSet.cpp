@@ -10,6 +10,7 @@
 #include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/AuraPlayerController.h"
+#include "Aura/AuraLogChannels.h"
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
@@ -87,7 +88,8 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
-	
+
+	// When working with Meta Attributes the usual practice is to set a local float to Meta Att.'s value and then zero-out the Att. itself
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();
@@ -116,6 +118,17 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			
 			ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCrit);
 		}
+	}
+
+	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
+	{
+		const float LocalIncomingXP = GetIncomingXP();
+		SetIncomingXP(0.f);
+		if (LocalIncomingXP > 0.f)
+		{
+			UE_LOG(LogAura, Warning, TEXT("Incoming XP: %f"), LocalIncomingXP);
+		}
+		
 	}
 }
 
