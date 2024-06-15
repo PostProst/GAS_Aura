@@ -28,6 +28,8 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Attributes_Resistance_Lightning, "Attributes.Resistan
 UE_DEFINE_GAMEPLAY_TAG(Tag_Attributes_Resistance_Arcane, "Attributes.Resistance.Arcane");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Attributes_Resistance_Physical, "Attributes.Resistance.Physical");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Attributes_Meta_IncomingXP, "Attributes.Meta.IncomingXP");
+
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_LMB, "InputTag.LMB");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_RMB, "InputTag.RMB");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_1, "InputTag.1");
