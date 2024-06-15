@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/AuraAttributeSet.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
 #include "GameplayTagsManager.h"
@@ -11,6 +12,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/AuraPlayerController.h"
 #include "Aura/AuraLogChannels.h"
+
 
 UAuraAttributeSet::UAuraAttributeSet()
 {
@@ -112,6 +114,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				{
 					CombatInterface->Die();
 				}
+				SendXPEvent(Props);
 			}
 			const bool bBlock = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
 			const bool bCrit = UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
@@ -126,7 +129,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		SetIncomingXP(0.f);
 		if (LocalIncomingXP > 0.f)
 		{
-			UE_LOG(LogAura, Warning, TEXT("Incoming XP: %f"), LocalIncomingXP);
+			
 		}
 		
 	}
@@ -187,6 +190,23 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
 		Props.TargetASC = Data.Target;
 	}
+}
+
+void UAuraAttributeSet::SendXPEvent(const FEffectProperties& Props)
+{
+	if (ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(Props.TargetCharacter))
+	{
+		// get XP amount from Target
+		const int32 XPReward = UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(Props.TargetCharacter, TargetCombatInterface->Execute_GetCharacterClass(Props.TargetCharacter), TargetCombatInterface->GetPlayerLevel());
+
+		// send XP gameplay event to Source
+		const FGameplayTag XPTag = FGameplayTag::RequestGameplayTag("Attributes.Meta.IncomingXP");
+		FGameplayEventData Payload;
+		Payload.EventTag = XPTag;
+		Payload.EventMagnitude = XPReward;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, XPTag, Payload);
+	}
+	
 }
 
 void UAuraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
