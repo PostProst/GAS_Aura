@@ -45,6 +45,11 @@ void AAuraCharacterBase::BeginDestroy()
 	}
 }
 
+ECharacterClass AAuraCharacterBase::GetCharacterClass_Implementation()
+{
+	return CharacterClass;
+}
+
 void AAuraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

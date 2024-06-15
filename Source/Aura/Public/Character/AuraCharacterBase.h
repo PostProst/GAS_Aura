@@ -48,6 +48,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category=Combat)
 	TArray<FTaggedMontage> AttackMontages;
+
+	virtual ECharacterClass GetCharacterClass_Implementation() override;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -116,6 +118,9 @@ protected:
 
 	// Minions
 	int32 MinionCount = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Abilities")
