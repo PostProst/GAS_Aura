@@ -105,8 +105,9 @@ void AAuraCharacterBase::AddCharacterAbilities()
 {
 	if (!HasAuthority()) return;
 	
-	UAuraAbilitySystemComponent* ASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
-	ASC->AddCharacterAbilities(StartupAbilities);
+	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+	AuraASC->AddCharacterAbilities(StartupAbilities);
+	AuraASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 void AAuraCharacterBase::Dissolve()
