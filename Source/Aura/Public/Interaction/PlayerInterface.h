@@ -21,8 +21,6 @@ class AURA_API IPlayerInterface
 	GENERATED_BODY()
 
 public:
-	
 	UFUNCTION(BlueprintNativeEvent)
 	void AddToXP(int32 InXP);
-	
 };

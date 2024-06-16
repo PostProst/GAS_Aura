@@ -128,15 +128,13 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		const float LocalIncomingXP = GetIncomingXP();
 		SetIncomingXP(0.f);
-		//TODO: see if we should lvl up
 		if (LocalIncomingXP > 0.f)
 		{
-			if (IPlayerInterface* PlayerInterface = Cast<IPlayerInterface>(Props.SourceCharacter))
+			if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
 			{
-				PlayerInterface->Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
+				IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
 			}
 		}
-		
 	}
 }
 
