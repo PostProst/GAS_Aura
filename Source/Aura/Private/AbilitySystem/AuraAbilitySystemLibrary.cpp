@@ -97,9 +97,10 @@ void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext
 	const FCharacterClassDefaultInfo& DefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
 	for (auto const Ability : DefaultInfo.StartupAbilities)
 	{
-		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ASC->GetAvatarActor()))
+		// Implements<>() function needs to take in U version of the interface class instead of I
+		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
 		{
-			const float CharacterLevel = CombatInterface->GetPlayerLevel();
+			const float CharacterLevel = ICombatInterface::Execute_GetPlayerLevel(ASC->GetAvatarActor());
 			const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability, CharacterLevel);
 			ASC->GiveAbility(AbilitySpec);	
 		}
@@ -108,7 +109,6 @@ void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext
 
 UCharacterClassInfo* UAuraAbilitySystemLibrary::GetCharacterClassInfo(const UObject* WorldContext)
 {
-	// get the Data Asset from the game mode
 	const AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContext));
 	if(AuraGameMode)
 	{

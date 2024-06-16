@@ -43,7 +43,9 @@ class AURA_API ICombatInterface
 
 	
 public:
-	virtual int32 GetPlayerLevel();
+	//BlueprintNativeEvent functions can be used as static in C++. Without a need to cast to the interface
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetPlayerLevel();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector GetCombatSocketLocation(const FGameplayTag& SocketTag);
