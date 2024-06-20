@@ -77,6 +77,7 @@ void AAuraPlayerState::AddToXP(int32 InXP)
 			//TODO: add AttributePoints
 			//TODO: add SpellPoints
 		}
+		OnLevelChangedDelegate.Broadcast(Level);
 		//TODO: top off Health and Mana
 	}
 	OnXPChangedDelegate.Broadcast(XP);
