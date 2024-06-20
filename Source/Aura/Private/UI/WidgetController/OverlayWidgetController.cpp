@@ -16,7 +16,10 @@ void UOverlayWidgetController::BroadcastInitialValues()
 	OnMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());
 	OnManaChanged.Broadcast(AuraAttributeSet->GetMana());
 	OnMaxManaChanged.Broadcast(AuraAttributeSet->GetMaxMana());
-	
+
+	const AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
+	OnXPPercentChangedDelegate.Broadcast(AuraPlayerState->GetXP());
+	OnPlayerLevelChanged.Broadcast(AuraPlayerState->GetPlayerLevel());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
