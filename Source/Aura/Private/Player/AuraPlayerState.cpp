@@ -25,6 +25,8 @@ void AAuraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	
 	DOREPLIFETIME(AAuraPlayerState, Level);
 	DOREPLIFETIME(AAuraPlayerState, XP);
+	DOREPLIFETIME(AAuraPlayerState, AttributePoints);
+	DOREPLIFETIME(AAuraPlayerState, SpellPoints);
 }
 
 UAbilitySystemComponent* AAuraPlayerState::GetAbilitySystemComponent() const
@@ -54,6 +56,16 @@ void AAuraPlayerState::OnRep_XP(int32 OldXP)
 	OnXPChangedDelegate.Broadcast(XP);
 }
 
+void AAuraPlayerState::OnRep_AttributePoints(int32 OldAttributePoints)
+{
+	OnAttributePointsChangedDelegate.Broadcast(AttributePoints);
+}
+
+void AAuraPlayerState::OnRep_SpellPoints(int32 OldSpellPoints)
+{
+	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
+}
+
 void AAuraPlayerState::SetXP(int32 NewXP)
 {
 	XP = NewXP;
@@ -73,13 +85,37 @@ void AAuraPlayerState::AddToXP(int32 InXP)
 		{
 			const int32 AttributePointsReward = LevelUpInfo->LevelUpInformation[Level].AttributePointReward;
 			const int32 SpellPointsReward = LevelUpInfo->LevelUpInformation[Level].SpellPointReward;
+			AddToAttributePoints(AttributePointsReward);
+			AddToSpellPoints(SpellPointsReward);
 			Level++;
-			//TODO: add AttributePoints
-			//TODO: add SpellPoints
 		}
 		OnLevelChangedDelegate.Broadcast(Level);
 		//TODO: top off Health and Mana
 	}
 	OnXPChangedDelegate.Broadcast(XP);
+}
+
+void AAuraPlayerState::AddToAttributePoints(int32 InAttPoints)
+{
+	AttributePoints += InAttPoints;
+	OnAttributePointsChangedDelegate.Broadcast(AttributePoints);
+}
+
+void AAuraPlayerState::SetAttributePoints(int32 InAttPoints)
+{
+	AttributePoints = InAttPoints;
+	OnAttributePointsChangedDelegate.Broadcast(AttributePoints);
+}
+
+void AAuraPlayerState::AddToSpellPoints(int32 InSpellPoints)
+{
+	SpellPoints += InSpellPoints;
+	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
+}
+
+void AAuraPlayerState::SetSpellPoints(int32 InSpellPoints)
+{
+	SpellPoints = InSpellPoints;
+	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
 }
 
