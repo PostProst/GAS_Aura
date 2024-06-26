@@ -89,8 +89,12 @@ void AAuraPlayerState::AddToXP(int32 InXP)
 			AddToSpellPoints(SpellPointsReward);
 			Level++;
 		}
+		// top off Health and Mana on level up
+		UAuraAttributeSet* AuraAS = CastChecked<UAuraAttributeSet>(AttributeSet);
+		AuraAS->SetTopOffHealth(true);
+		AuraAS->SetTopOffMana(true);
+		
 		OnLevelChangedDelegate.Broadcast(Level);
-		//TODO: top off Health and Mana
 	}
 	OnXPChangedDelegate.Broadcast(XP);
 }

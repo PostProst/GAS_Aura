@@ -64,6 +64,5 @@ void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& 
 	
 	FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Tag);
 	Info.AttributeValue = Info.AttributeGetter.GetNumericValue(AS);
-	UE_LOG(LogTemp, Warning, TEXT("Value is :%f"), Info.AttributeGetter.GetNumericValue(AS));
 	AttributeInfoDelegate.Broadcast(Info);
 }

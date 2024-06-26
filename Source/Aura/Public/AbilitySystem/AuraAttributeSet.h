@@ -64,6 +64,9 @@ public:
 	
 	// Called just before a GameplayEffect is executed to modify the base value of an attribute
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
+	/** Called just after any modification happens to an attribute. */
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 	
 	/*
 	 * Vital Attributes
@@ -235,4 +238,10 @@ private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 	void ShowFloatingText(const FEffectProperties& Props, float DamageAmount, bool bBlockedHit, bool bCriticalHit) const;
 	void SendXPEvent(const FEffectProperties& Props);
+	bool bTopOffHealth = false;
+	bool bTopOffMana = false;
+
+public:
+	FORCEINLINE void SetTopOffHealth(bool InTopOffHealth) { bTopOffHealth = InTopOffHealth; }
+	FORCEINLINE void SetTopOffMana(bool InTopOffMana) { bTopOffMana = InTopOffMana; }
 };
