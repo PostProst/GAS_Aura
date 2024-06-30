@@ -19,7 +19,7 @@ void UOverlayWidgetController::BroadcastInitialValues()
 
 	const AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
 	OnXPPercentChangedDelegate.Broadcast(AuraPlayerState->GetXP());
-	OnPlayerLevelChanged.Broadcast(AuraPlayerState->GetPlayerLevel());
+	//OnPlayerLevelChanged.Broadcast(AuraPlayerState->GetPlayerLevel());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
