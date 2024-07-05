@@ -17,9 +17,8 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 		BroadcastAttributeInfo(Attribute.AttributeTag);
 	}
 	
-	const AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	OnAttributePointsChanged.Broadcast(AuraPlayerState->GetAttributePoints());
-	OnSpellPointsChanged.Broadcast(AuraPlayerState->GetSpellPoints());
+	OnAttributePointsChanged.Broadcast(GetAuraPS()->GetAttributePoints());
+	OnSpellPointsChanged.Broadcast(GetAuraPS()->GetSpellPoints());
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
@@ -34,14 +33,14 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 			BroadcastAttributeInfo(Attribute.AttributeTag);
 		});
 	}
-	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	AuraPlayerState->OnAttributePointsChangedDelegate.AddLambda(
+	
+	GetAuraPS()->OnAttributePointsChangedDelegate.AddLambda(
 		[this](int32 Points)
 		{
 			OnAttributePointsChanged.Broadcast(Points);
 		}
 	);
-	AuraPlayerState->OnSpellPointsChangedDelegate.AddLambda(
+	GetAuraPS()->OnSpellPointsChangedDelegate.AddLambda(
 		[this](int32 Points)
 		{
 			OnSpellPointsChanged.Broadcast(Points);
@@ -51,18 +50,14 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 
 void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
-	const AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	if (AuraPlayerState->GetAttributePoints() <= 0) return;
+	if (GetAuraPS()->GetAttributePoints() <= 0) return;
 	
-	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
-	AuraASC->UpgradeAttribute(AttributeTag);
+	GetAuraASC()->UpgradeAttribute(AttributeTag);
 }
 
-void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& Tag) const
+void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& Tag)
 {
-	const UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
-	
 	FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Tag);
-	Info.AttributeValue = Info.AttributeGetter.GetNumericValue(AS);
+	Info.AttributeValue = Info.AttributeGetter.GetNumericValue(GetAuraAS());
 	AttributeInfoDelegate.Broadcast(Info);
 }
