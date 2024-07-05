@@ -12,6 +12,7 @@ class UAuraUserWidget;
 class UOverlayWidgetController;
 struct FWidgetControllerParams;
 class UAttributeMenuWidgetController;
+class USpellMenuWidgetController;
 
 /**
  * 
@@ -38,17 +39,13 @@ public:
 
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 	UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
+	USpellMenuWidgetController* GetSpellMenuWidgetController(const FWidgetControllerParams& WCParams);
 
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
 
-protected:
-
-
-	
 private:
 
-	// Overlay Widget
-
+	// Overlay
 	UPROPERTY()
 	TObjectPtr<UAuraUserWidget> OverlayWidget;
 	
@@ -61,11 +58,17 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UOverlayWidgetController> OverlayWidgetControllerClass;
 
-	// AttributeMenuWidgetController
-	
+	// Attribute Menu
 	UPROPERTY()
 	TObjectPtr<UAttributeMenuWidgetController> AttributeMenuWidgetController;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UAttributeMenuWidgetController> AttributeMenuWidgetControllerClass;
+
+	// Spell Menu
+	UPROPERTY()
+	TObjectPtr<USpellMenuWidgetController> SpellMenuWidgetController;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USpellMenuWidgetController> SpellMenuWidgetControllerClass;
 };
