@@ -36,6 +36,8 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_1, "InputTag.1");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_2, "InputTag.2");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_3, "InputTag.3");
 UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_4, "InputTag.4");
+UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_Passive_1, "InputTag.Passive.1");
+UE_DEFINE_GAMEPLAY_TAG(Tag_InputTag_Passive_2, "InputTag.Passive.2");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Damage, "Damage");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Fire, "Damage.Fire");
