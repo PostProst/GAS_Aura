@@ -62,8 +62,18 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Effects_HitReact);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Attack);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Summon);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Fire_FireBolt);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_HitReact);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Status_Locked);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Status_Eligible);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Status_Unlocked);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Status_Equipped);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Type_Offensive);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Type_Passive);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Type_None);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Fire_FireBolt);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Cooldown_Fire_FireBolt);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_CombatSocket_Weapon);

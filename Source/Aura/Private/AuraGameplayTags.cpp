@@ -49,8 +49,18 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Attack, "Abilities.Attack");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Summon, "Abilities.Summon");
-UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Fire_FireBolt, "Abilities.Fire.FireBolt");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_HitReact, "Abilities.HitReact");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Status_Locked, "Abilities.Status.Locked");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Status_Eligible, "Abilities.Status.Eligible");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Status_Unlocked, "Abilities.Status.Unlocked");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Status_Equipped, "Abilities.Status.Equipped");
+
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Type_Offensive, "Abilities.Type.Offensive");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Type_Passive, "Abilities.Type.Passive");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Type_None, "Abilities.Type.None");
+
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Fire_FireBolt, "Abilities.Fire.FireBolt");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Cooldown_Fire_FireBolt, "Cooldown.Fire.FireBolt");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_CombatSocket_Weapon, "CombatSocket.Weapon");
