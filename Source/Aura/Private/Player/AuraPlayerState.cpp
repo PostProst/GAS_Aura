@@ -88,6 +88,8 @@ void AAuraPlayerState::AddToXP(int32 InXP)
 			AddToAttributePoints(AttributePointsReward);
 			AddToSpellPoints(SpellPointsReward);
 			Level++;
+			UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+			AuraASC->UpdateAbilityStatuses(Level);
 		}
 		// top off Health and Mana on level up
 		UAuraAttributeSet* AuraAS = CastChecked<UAuraAttributeSet>(AttributeSet);

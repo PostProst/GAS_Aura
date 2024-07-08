@@ -15,6 +15,7 @@ class UAttributeMenuWidgetController;
 class USpellMenuWidgetController;
 struct FWidgetControllerParams;
 class AAuraHUD;
+class UAbilityInfo;
 /**
  * 
  */
@@ -47,6 +48,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | CharacterClassDefaults", meta = (DefaultToSelf = "WorldContext"))
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContext);
+	
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | Ability Info", meta = (DefaultToSelf = "WorldContext"))
+	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContext);
 
 	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary | CharacterClassDefaults", meta = (DefaultToSelf = "WorldContext"))
 	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContext, ECharacterClass Class, int32 Level);

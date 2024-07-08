@@ -74,6 +74,8 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Type_Passive);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Type_None);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Fire_FireBolt);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Lightning_Electrocute);
+
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Cooldown_Fire_FireBolt);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_CombatSocket_Weapon);
