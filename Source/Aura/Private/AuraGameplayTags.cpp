@@ -47,6 +47,7 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Physical, "Damage.Physical");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_None, "Abilities.None");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Attack, "Abilities.Attack");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Summon, "Abilities.Summon");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_HitReact, "Abilities.HitReact");
