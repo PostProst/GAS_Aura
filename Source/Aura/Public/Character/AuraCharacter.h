@@ -30,6 +30,8 @@ public:
 	/* Player Interface */
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void AddToAttributePoints_Implementation(int32 InAttributePoints) override;
+	virtual void AddToSpellPoints_Implementation(int32 InSpellPoints) override;
+	/* END Player Interface*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;

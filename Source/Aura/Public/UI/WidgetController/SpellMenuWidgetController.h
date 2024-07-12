@@ -3,8 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "SpellMenuWidgetController.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSpellGlobeSelectedSignature, bool, bEnableSpendPointBtn, bool, bEnableEquipBtn);
+
+struct FSelectedAbility
+{
+	FGameplayTag AbilityTag = FGameplayTag();
+	FGameplayTag StatusTag = FGameplayTag();
+};
 
 /**
  * 
@@ -21,5 +30,21 @@ public:
 	
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SpendPointButtonPressed();
+
+	UFUNCTION(BlueprintCallable)
+	void SpellGlobeSelected(const FGameplayTag& AbilityTag);
+
+	UFUNCTION(BlueprintCallable)
+	void ShouldEnableButtons(const FGameplayTag& StatusTag, int32 InSpellPoints, bool& bEnableSpendPointBtn, bool& bEnableEquipBtn);
+
+	// handles enabling/disabling buttons on the widget
+	UPROPERTY(BlueprintAssignable)
+	FOnSpellGlobeSelectedSignature OnSpellGlobeSelectedDelegate;
 	
+private:
+	FSelectedAbility SelectedAbility;
+	int32 SpellPoints;
 };

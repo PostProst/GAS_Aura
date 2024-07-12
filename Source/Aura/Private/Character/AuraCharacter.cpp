@@ -78,6 +78,16 @@ void AAuraCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints
 	AuraPlayerState->AddToAttributePoints(InAttributePoints);
 }
 
+void AAuraCharacter::AddToSpellPoints_Implementation(int32 InSpellPoints)
+{
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	check(AuraPlayerState);
+	if (AuraPlayerState->GetSpellPoints() > 0)
+	{
+		AuraPlayerState->AddToSpellPoints(InSpellPoints);	
+	}
+}
+
 void AAuraCharacter::MulticastLevelUpParticles_Implementation() const
 {
 	check(LevelUpNiagaraComponent);
