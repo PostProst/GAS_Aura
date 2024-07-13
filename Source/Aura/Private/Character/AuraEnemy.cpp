@@ -70,8 +70,9 @@ void AAuraEnemy::BeginPlay()
 	if (const UAuraAttributeSet* AuraAS = CastChecked<UAuraAttributeSet>(AttributeSet))
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAS->GetHealthAttribute()).AddLambda(
-		[this](const FOnAttributeChangeData& Data)
+		[this, AuraAS](const FOnAttributeChangeData& Data)
 		{
+			OnMaxHealthChanged.Broadcast(AuraAS->GetMaxHealth()); // workaround to set MaxHealth for the client when it's not properly initialized when starting a game
 			OnHealthChanged.Broadcast(Data.NewValue);
 		});
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAS->GetMaxHealthAttribute()).AddLambda(
@@ -83,7 +84,7 @@ void AAuraEnemy::BeginPlay()
 		// broadcast initial Health values
 		OnHealthChanged.Broadcast(AuraAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(AuraAS->GetMaxHealth());
-
+		
 		// listen for the event when a certain GameplayTag is added or removed
 		const FGameplayTag HitReactTag = UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact"));
 		AbilitySystemComponent->RegisterGameplayTagEvent(HitReactTag, EGameplayTagEventType::NewOrRemoved).AddUObject(
