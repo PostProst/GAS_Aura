@@ -179,6 +179,29 @@ void UAuraAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
 	}
 }
 
+bool UAuraAbilitySystemComponent::GetDescriptionsForTag(const FGameplayTag& AbilityTag, FString& OutDescription,
+	FString& OutNextLvlDescription)
+{
+	// make sure the ability exists among activatable abilities on out ASC
+	if (const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromTag(AbilityTag))
+	{
+		UAuraGameplayAbility* AuraAbility = Cast<UAuraGameplayAbility>(AbilitySpec->Ability);
+		OutDescription = AuraAbility->GetDescription(AbilitySpec->Level);
+		OutNextLvlDescription = AuraAbility->GetNextLvlDescription(AbilitySpec->Level + 1);
+		return true;
+	}
+	// return locked ability description
+	if (const UAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor()))
+	{
+		OutDescription = UAuraGameplayAbility::GetLockedDescription(AbilityInfo->FindAbilityInfoForTag(AbilityTag).LevelRequirement);
+		OutNextLvlDescription = FString();
+		return false;
+	}
+	OutDescription = FString();
+	OutNextLvlDescription = FString();
+	return false;
+}
+
 void UAuraAbilitySystemComponent::ServerSpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)
 {
 	if (FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromTag(AbilityTag))

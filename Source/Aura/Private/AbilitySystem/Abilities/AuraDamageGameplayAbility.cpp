@@ -29,3 +29,8 @@ void UAuraDamageGameplayAbility::SetVisibilityBasedAnimTickOption(EVisibilityBas
 		}
 	}
 }
+
+float UAuraDamageGameplayAbility::GetDamage(int32 Level, FGameplayTag DamageTypeTag)
+{
+	return DamageTypes.Find(DamageTypeTag)->GetValueAtLevel(Level);
+}

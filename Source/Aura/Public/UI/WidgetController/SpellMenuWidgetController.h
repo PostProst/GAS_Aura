@@ -7,7 +7,7 @@
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "SpellMenuWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSpellGlobeSelectedSignature, bool, bEnableSpendPointBtn, bool, bEnableEquipBtn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnSpellGlobeSelectedSignature, bool, bEnableSpendPointBtn, bool, bEnableEquipBtn, FString, Description, FString, NextLvlDescription);
 
 struct FSelectedAbility
 {

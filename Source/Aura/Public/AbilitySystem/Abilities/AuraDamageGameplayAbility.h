@@ -29,5 +29,8 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+
+	UFUNCTION(BlueprintPure)
+	float GetDamage(int32 Level, FGameplayTag DamageTypeTag);
 	
 };
