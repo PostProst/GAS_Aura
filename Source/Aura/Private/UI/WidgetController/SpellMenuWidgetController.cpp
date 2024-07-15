@@ -116,3 +116,10 @@ void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& StatusT
 	bEnableSpendPointBtn = bSpellPointBtn;
 	bEnableEquipBtn = bEquipBtn;
 }
+
+void USpellMenuWidgetController::GlobeDeselect()
+{
+	SelectedAbility.AbilityTag = FGameplayTag::RequestGameplayTag(FName("Abilities.None"));
+	SelectedAbility.StatusTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Locked"));
+	OnSpellGlobeSelectedDelegate.Broadcast(false, false, FString(), FString());
+}

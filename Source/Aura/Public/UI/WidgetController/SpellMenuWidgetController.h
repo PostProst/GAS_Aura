@@ -43,6 +43,9 @@ public:
 	// handles enabling/disabling buttons on the widget
 	UPROPERTY(BlueprintAssignable)
 	FOnSpellGlobeSelectedSignature OnSpellGlobeSelectedDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	void GlobeDeselect();
 	
 private:
 	FSelectedAbility SelectedAbility;
