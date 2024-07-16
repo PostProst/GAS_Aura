@@ -67,6 +67,11 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 	if (AbilityTag == FGameplayTag::RequestGameplayTag(FName("Abilities.None")))
 	{
 		OnSpellGlobeSelectedDelegate.Broadcast(false, false, FString(), FString());
+		if(bWaitingForEquipSelection)
+		{
+			StopWaitingForEquipDelegate.Broadcast();
+			bWaitingForEquipSelection = false;
+		}
 		return;
 	}
 	SelectedAbility.AbilityTag = AbilityTag;
@@ -78,6 +83,13 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 	{
 		SelectedAbility.StatusTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Locked"));
 	}
+	
+	if (bWaitingForEquipSelection)
+	{
+		StopWaitingForEquipDelegate.Broadcast();
+		bWaitingForEquipSelection = false;
+	}
+	
 	bool bEnableSpellBtn;
 	bool bEnableEquipBtn;
 	ShouldEnableButtons(SelectedAbility.StatusTag, GetAuraPS()->GetSpellPoints(), bEnableSpellBtn, bEnableEquipBtn);
@@ -97,14 +109,14 @@ void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& StatusT
 	bool bSpellPointBtn = false;
 	bool bEquipBtn = false;
 	
-	if (StatusTag == EligibleTag || StatusTag == EquippedTag)
+	if (StatusTag == EligibleTag)
 	{
 		if (InSpellPoints > 0)
 		{
 			bSpellPointBtn = true;
 		}
 	}
-	else if (StatusTag == UnlockedTag)
+	else if (StatusTag == UnlockedTag || StatusTag == EquippedTag)
 	{
 		if (InSpellPoints > 0)
 		{
@@ -119,7 +131,20 @@ void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& StatusT
 
 void USpellMenuWidgetController::GlobeDeselect()
 {
+	if (bWaitingForEquipSelection)
+	{
+		StopWaitingForEquipDelegate.Broadcast();
+		bWaitingForEquipSelection = false;
+	}
+	
 	SelectedAbility.AbilityTag = FGameplayTag::RequestGameplayTag(FName("Abilities.None"));
 	SelectedAbility.StatusTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Locked"));
 	OnSpellGlobeSelectedDelegate.Broadcast(false, false, FString(), FString());
+}
+
+void USpellMenuWidgetController::EquipButtonPressed()
+{
+	const FGameplayTag AbilityType = AbilityInfo->FindAbilityInfoForTag(SelectedAbility.AbilityTag).AbilityType;
+	WaitForEquipDelegate.Broadcast(AbilityType);
+	bWaitingForEquipSelection = true;
 }
