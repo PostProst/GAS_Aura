@@ -10,12 +10,8 @@
 void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 {
 	const FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
-
-	// loop through the Damage Types map on the GA and assign SetByCallerMagnitude for each Damage Type 
-	for (auto Pair : DamageTypes)
-	{
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Pair.Key, Pair.Value.GetValueAtLevel(GetAbilityLevel()));
-	}
+	
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, Damage.GetValueAtLevel(GetAbilityLevel()));
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor));
 }
 
@@ -32,5 +28,5 @@ void UAuraDamageGameplayAbility::SetVisibilityBasedAnimTickOption(EVisibilityBas
 
 float UAuraDamageGameplayAbility::GetDamage(int32 Level, FGameplayTag DamageTypeTag)
 {
-	return DamageTypes.Find(DamageTypeTag)->GetValueAtLevel(Level);
+	return Damage.GetValueAtLevel(Level);
 }

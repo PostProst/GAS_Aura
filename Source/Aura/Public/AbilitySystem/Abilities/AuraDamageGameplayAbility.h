@@ -24,8 +24,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void SetVisibilityBasedAnimTickOption(EVisibilityBasedAnimTickOption Option);
 
+	// meta=(Categories="Damage") - limits GameplayTags selection in editor only to ones that start with 'Damage'
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Damage", meta=(Categories="Damage"))
+	FGameplayTag DamageType;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Damage")
-	TMap<FGameplayTag, FScalableFloat> DamageTypes;
+	FScalableFloat Damage;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
