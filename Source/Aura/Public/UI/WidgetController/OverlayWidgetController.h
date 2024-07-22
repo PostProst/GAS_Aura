@@ -85,6 +85,8 @@ protected:
 	
 	void OnXPChanged(int32 NewXP);
 	
+	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PreviousInputTag) const;
+	
 };
 
 // 'template <typename T>' must be written above the template function's definition as well as declaration

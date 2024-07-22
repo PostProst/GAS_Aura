@@ -56,6 +56,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			}
 		);
 
+	GetAuraASC()->AbilityEquippedDelegate.AddUObject(this, &UOverlayWidgetController::OnAbilityEquipped);
 	
 	// Binding a callback for a AbilitiesGivenDelegate, broadcast when abilities are given on startup if they weren't given yet
 	if (!GetAuraASC()->bStartupAbilitiesGiven)
@@ -126,6 +127,25 @@ void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 	float Percent = static_cast<float>(TotalXP / LevelUpInfo->LevelUpInformation[LookUpLevel].ExpRequirement);
 	UE_LOG(LogTemp, Warning, TEXT(""));
 	
+	
+}
+
+void UOverlayWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag,
+	const FGameplayTag& InputTag, const FGameplayTag& PreviousInputTag) const
+{
+	// clear out old spell slot
+	FAuraAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Unlocked"));
+	LastSlotInfo.InputTag = PreviousInputTag;
+	LastSlotInfo.AbilityTag = FGameplayTag::RequestGameplayTag(FName("Abilities.None"));
+	// broadcast empty info if we're equipping an already equipped spell
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	// fill in new spell slot
+	FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+	Info.StatusTag = StatusTag;
+	Info.InputTag = InputTag;
+	AbilityInfoDelegate.Broadcast(Info);
 	
 }
 

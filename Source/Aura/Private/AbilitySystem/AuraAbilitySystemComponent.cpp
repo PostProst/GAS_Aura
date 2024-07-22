@@ -124,6 +124,15 @@ FGameplayTag UAuraAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbi
 	return FGameplayTag();
 }
 
+FGameplayTag UAuraAbilitySystemComponent::GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	if (const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromTag(AbilityTag))
+	{
+		return GetInputTagFromSpec(*AbilitySpec);
+	}
+	return FGameplayTag();
+}
+
 FGameplayTag UAuraAbilitySystemComponent::GetAbilityStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec)
 {
 	for (const FGameplayTag& StatusTag : AbilitySpec.DynamicAbilityTags)
@@ -132,6 +141,15 @@ FGameplayTag UAuraAbilitySystemComponent::GetAbilityStatusFromSpec(const FGamepl
 		{
 			return StatusTag;
 		}
+	}
+	return FGameplayTag();
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetAbilityStatusFromTag(const FGameplayTag& AbilityTag)
+{
+	if (const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromTag(AbilityTag))
+	{
+		return GetAbilityStatusFromSpec(*AbilitySpec);
 	}
 	return FGameplayTag();
 }
@@ -179,8 +197,47 @@ void UAuraAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
 	}
 }
 
+void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGameplayTag& AbilityTag,
+	const FGameplayTag& InputTag)
+{
+	// first make sure the ability exists on the ASC
+	if (FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromTag(AbilityTag))
+	{
+		const FGameplayTag& PreviousInputTag = GetInputTagFromSpec(*AbilitySpec);
+		const FGameplayTag& Status = GetAbilityStatusFromSpec(*AbilitySpec);
+
+		const FGameplayTag& EquippedTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Equipped"));
+		const FGameplayTag& UnlockedTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Unlocked"));
+
+		if (PreviousInputTag == InputTag) return;
+		if (Status == EquippedTag || Status == UnlockedTag)
+		{
+			// remove this InputTag from any ability that has it as well as this ability's InputTag
+			ClearAbilitiesOfInputTag(InputTag);
+			ClearInputTag(AbilitySpec);
+			// assign new input tag to the AbilitySpec
+			AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
+
+			// update ability status if it was unlocked and became equipped
+			if (Status == UnlockedTag)
+			{
+				AbilitySpec->DynamicAbilityTags.RemoveTag(UnlockedTag);
+				AbilitySpec->DynamicAbilityTags.AddTag(EquippedTag);
+			}
+			MarkAbilitySpecDirty(*AbilitySpec);
+			ClientEquipAbility(AbilityTag, EquippedTag, InputTag, PreviousInputTag);
+		}
+	}
+}
+
+void UAuraAbilitySystemComponent::ClientEquipAbility_Implementation(const FGameplayTag& AbilityTag,
+	const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PreviousInputTag)
+{
+	AbilityEquippedDelegate.Broadcast(AbilityTag, StatusTag, InputTag, PreviousInputTag);
+}
+
 bool UAuraAbilitySystemComponent::GetDescriptionsForTag(const FGameplayTag& AbilityTag, FString& OutDescription,
-	FString& OutNextLvlDescription)
+                                                        FString& OutNextLvlDescription)
 {
 	// make sure the ability exists among activatable abilities on out ASC
 	if (const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromTag(AbilityTag))
@@ -200,6 +257,25 @@ bool UAuraAbilitySystemComponent::GetDescriptionsForTag(const FGameplayTag& Abil
 	OutDescription = FString();
 	OutNextLvlDescription = FString();
 	return false;
+}
+
+void UAuraAbilitySystemComponent::ClearInputTag(FGameplayAbilitySpec* Spec)
+{
+	const FGameplayTag InputTag = GetInputTagFromSpec(*Spec);
+	Spec->DynamicAbilityTags.RemoveTag(InputTag);
+	MarkAbilitySpecDirty(*Spec);
+}
+
+void UAuraAbilitySystemComponent::ClearAbilitiesOfInputTag(const FGameplayTag& InputTag)
+{
+	FScopedAbilityListLock ActiveScopeLock(*this);
+	for (FGameplayAbilitySpec& Spec : GetActivatableAbilities())
+	{
+		if (Spec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			ClearInputTag(&Spec);
+		}
+	}
 }
 
 void UAuraAbilitySystemComponent::ServerSpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)

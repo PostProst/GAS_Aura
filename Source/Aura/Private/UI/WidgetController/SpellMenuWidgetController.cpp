@@ -51,6 +51,8 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 			}
 			OnSpellPointsChanged.Broadcast(InPoints);	
 		});
+
+	GetAuraASC()->AbilityEquippedDelegate.AddUObject(this, &USpellMenuWidgetController::OnAbilityEquipped);
 }
 
 void USpellMenuWidgetController::SpendPointButtonPressed()
@@ -147,4 +149,45 @@ void USpellMenuWidgetController::EquipButtonPressed()
 	const FGameplayTag AbilityType = AbilityInfo->FindAbilityInfoForTag(SelectedAbility.AbilityTag).AbilityType;
 	WaitForEquipDelegate.Broadcast(AbilityType);
 	bWaitingForEquipSelection = true;
+
+	// if we press equip on already equipped spell, we must cash its current input tag to clear it after reassigning
+	if (SelectedAbility.StatusTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Equipped"))))
+	{
+		SelectedAbilityInputSlot = AbilityInfo->FindAbilityInfoForTag(SelectedAbility.AbilityTag).InputTag;
+	}
+}
+
+void USpellMenuWidgetController::SpellRowGlobePressed(const FGameplayTag& InputTag, const FGameplayTag& InGlobeAbilityType)
+{
+	if (!bWaitingForEquipSelection) return;
+	// check whether we try to assign an offensive ability to a passive slot and vice versa
+	const FGameplayTag SelectedAbilityType = AbilityInfo->FindAbilityInfoForTag(SelectedAbility.AbilityTag).AbilityType;
+	if (!SelectedAbilityType.MatchesTagExact(InGlobeAbilityType)) return;
+	if (GetAuraASC()->GetInputTagFromAbilityTag(SelectedAbility.AbilityTag) == InputTag) return;
+	
+	GetAuraASC()->ServerEquipAbility(SelectedAbility.AbilityTag, InputTag);
+}
+
+void USpellMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag,
+	const FGameplayTag& InputTag, const FGameplayTag& PreviousInputTag)
+{
+	bWaitingForEquipSelection = false;
+
+	// clear out old spell slot
+	FAuraAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Unlocked"));
+	LastSlotInfo.InputTag = PreviousInputTag;
+	LastSlotInfo.AbilityTag = FGameplayTag::RequestGameplayTag(FName("Abilities.None"));
+	// broadcast empty info if we're equipping an already equipped spell
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	// fill in new spell slot
+	FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+	Info.StatusTag = StatusTag;
+	Info.InputTag = InputTag;
+	AbilityInfoDelegate.Broadcast(Info);
+
+	StopWaitingForEquipDelegate.Broadcast();
+	SpellGlobeReassignedDelegate.Broadcast(AbilityTag);
+	GlobeDeselect();
 }
