@@ -36,11 +36,6 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Secondary_ManaRegeneration);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Secondary_MaxHealth);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Secondary_MaxMana);
 
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Fire);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Lightning);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Arcane);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Physical);
-
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Meta_IncomingXP);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_InputTag_LMB);
@@ -57,6 +52,20 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Fire);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Lightning);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Arcane);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Damage_Physical);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Fire);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Lightning);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Arcane);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Attributes_Resistance_Physical);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Debuff_Burn);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Debuff_Stun);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Debuff_Arcane);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Debuff_Physical);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Debuff_Chance);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Debuff_Damage);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Debuff_Frequency);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Debuff_Duration);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Effects_HitReact);
 
@@ -109,6 +118,7 @@ public:
  */
  
  TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
+ TMap<FGameplayTag, FGameplayTag> DamageTypesToDebuffs;
  
 protected:
  

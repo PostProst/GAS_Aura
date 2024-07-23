@@ -34,14 +34,19 @@ AAuraProjectile::AAuraProjectile()
 }
 
 
+void AAuraProjectile::OnHit()
+{
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	bHit = true;
+}
+
 void AAuraProjectile::Destroyed()
 {
 	// case when the Projectile is destroyed on the server before OnSphereOverlap happened on the client
 	if (!bHit && !HasAuthority())
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-		bHit = true;
+		OnHit();
 	}
 	Super::Destroyed();
 }
@@ -56,31 +61,29 @@ void AAuraProjectile::BeginPlay()
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// prevents overlapping with self
-	if(!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor) return;
-	// prevents friendly fire
-	if (UAuraAbilitySystemLibrary::IsFriend(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor)) return;
-	if(!bHit)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-		bHit = true;
-	}
+
+	
+	if(!bHit) OnHit();
 	
 	if (HasAuthority())
 	{
+		AActor* SourceAvatarActor = DamageEffectParams.SourceASC->GetAvatarActor();
+	
+		// prevents overlapping with self
+		if(SourceAvatarActor == OtherActor) return;
+		// prevents friendly fire
+		if (UAuraAbilitySystemLibrary::IsFriend(SourceAvatarActor, OtherActor)) return;
+		
 		// apply damage GameplayEffect
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
-			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+			DamageEffectParams.TargetASC = TargetASC;
+			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
 		
 		Destroy();
 	}
-	else
-	{
-		bHit = true;
-	}
+	else bHit = true;
 }
 
 

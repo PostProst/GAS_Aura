@@ -8,6 +8,7 @@
 #include "AuraAbilitySystemLibrary.generated.h"
 
 
+struct FDamageEffectParams;
 struct FGameplayEffectContextHandle;
 class UAbilitySystemComponent;
 class UOverlayWidgetController;
@@ -73,4 +74,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary | GameplayMechanics")
 	static bool IsFriend(const AActor* SourceActor, const AActor* TargetActor);
+
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | DamageEffect")
+	static FGameplayEffectContextHandle ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams);
 };

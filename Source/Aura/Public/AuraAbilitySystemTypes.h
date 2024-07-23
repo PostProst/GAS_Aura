@@ -3,6 +3,8 @@
 #include "GameplayEffectTypes.h"
 #include "AuraAbilitySystemTypes.generated.h"
 
+class UGameplayEffect;
+
 USTRUCT(BlueprintType)
 struct FAuraGameplayEffectContext : public FGameplayEffectContext
 {
@@ -43,8 +45,36 @@ protected:
 	
 	UPROPERTY()
 	bool bIsCriticalHit = false;
-private:
 	
+};
+
+USTRUCT(BlueprintType)
+struct FDamageEffectParams
+{
+	GENERATED_BODY()
+	
+	FDamageEffectParams(){}
+
+	UPROPERTY()
+	TObjectPtr<UObject> WorldContext = nullptr;
+
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> DamageGameplayEffectClass = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> SourceASC = nullptr;
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> TargetASC = nullptr;
+
+	float BaseDamage = 0.f;
+	float AbilityLevel = 1.f;
+	
+	FGameplayTag DamageType = FGameplayTag();
+
+	float DebuffChance = 0.f;
+	float DebuffDamage = 0.f;
+	float DebuffDuration = 0.f;
+	float DebuffFrequency = 0.f;
 };
 
 /** type traits to cover the custom aspects of a script struct **/

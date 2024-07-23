@@ -45,6 +45,15 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Lightning, "Damage.Lightning");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Arcane, "Damage.Arcane");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Damage_Physical, "Damage.Physical");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Burn, "Debuff.Burn");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Stun, "Debuff.Stun");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Arcane, "Debuff.Arcane");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Physical, "Debuff.Physical");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Chance, "Debuff.Chance");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Damage, "Debuff.Damage");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Frequency, "Debuff.Frequency");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Duration, "Debuff.Duration");
+
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_None, "Abilities.None");
@@ -98,9 +107,15 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Secondary_MaxMana = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxMana"), FString("Maximum amount of Mana obtainable"));
 	*/
 	
-	// Map Damage Types to Resistances
+	// map DamageTypes to Resistances
 	GameplayTags.DamageTypesToResistances.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Fire")), UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Fire")));
 	GameplayTags.DamageTypesToResistances.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Lightning")), UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Lightning")));
 	GameplayTags.DamageTypesToResistances.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Arcane")), UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Arcane")));
 	GameplayTags.DamageTypesToResistances.Add(UGameplayTagsManager::Get().RequestGameplayTag(FName("Damage.Physical")), UGameplayTagsManager::Get().RequestGameplayTag(FName("Attributes.Resistance.Physical")));
+
+	// map DamageTypes to Debuffs
+	GameplayTags.DamageTypesToDebuffs.Add(FGameplayTag::RequestGameplayTag(FName("Damage.Fire")), FGameplayTag::RequestGameplayTag(FName("Debuff.Burn")));
+	GameplayTags.DamageTypesToDebuffs.Add(FGameplayTag::RequestGameplayTag(FName("Damage.Lightning")), FGameplayTag::RequestGameplayTag(FName("Debuff.Stun")));
+	GameplayTags.DamageTypesToDebuffs.Add(FGameplayTag::RequestGameplayTag(FName("Damage.Arcane")), FGameplayTag::RequestGameplayTag(FName("Debuff.Arcane")));
+	GameplayTags.DamageTypesToDebuffs.Add(FGameplayTag::RequestGameplayTag(FName("Damage.Physical")), FGameplayTag::RequestGameplayTag(FName("Debuff.Physical")));
 }
