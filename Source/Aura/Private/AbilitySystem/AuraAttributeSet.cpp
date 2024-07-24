@@ -4,6 +4,8 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AuraAbilitySystemTypes.h"
+#include "AuraGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
 #include "GameplayTagsManager.h"
@@ -12,6 +14,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/AuraPlayerController.h"
 #include "Aura/AuraLogChannels.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interaction/PlayerInterface.h"
 
 
@@ -92,52 +95,22 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
 
-	// When working with Meta Attributes the usual practice is to set a local float to Meta Att.'s value and then zero-out the Att. itself
+	// return early if the Target is dead
+	if (Props.TargetCharacter->Implements<UCombatInterface>()
+		&& ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
+	
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
-		const float LocalIncomingDamage = GetIncomingDamage();
-		SetIncomingDamage(0.f);
-		if (LocalIncomingDamage > 0.f)
-		{
-			const float NewHealth = GetHealth() - LocalIncomingDamage;
-			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-
-			const bool bFatal = NewHealth <= 0;
-			if (!bFatal)
-			{
-				FGameplayTagContainer Tags;
-				Tags.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact")));
-				Props.TargetASC->TryActivateAbilitiesByTag(Tags);
-			}
-			else
-			{
-				if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
-				{
-					CombatInterface->Die();
-				}
-				SendXPEvent(Props);
-			}
-			const bool bBlock = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
-			const bool bCrit = UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
-			
-			ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCrit);
-		}
+		HandleIncomingDamage(Props);
 	}
 
 	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
 	{
-		const float LocalIncomingXP = GetIncomingXP();
-		SetIncomingXP(0.f);
-		if (LocalIncomingXP > 0.f)
-		{
-			if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
-			{
-				IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
-			}
-		}
+		HandleIncomingXP(Props);
 	}
 }
 
+/** Called just after any modification happens to an attribute. */
 void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
@@ -152,6 +125,112 @@ void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute,
 	{
 		SetMana(GetMaxMana());
 		bTopOffMana = false;
+	}
+}
+
+void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
+{
+	/*
+	 * When working with Meta Attributes the usual practice 
+	 * is to set a local float to Meta Att.'s value and then zero-out the Attribute value
+	 */
+	const float LocalIncomingDamage = GetIncomingDamage();
+	SetIncomingDamage(0.f);
+	if (LocalIncomingDamage > 0.f)
+	{
+		const float NewHealth = GetHealth() - LocalIncomingDamage;
+		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+		const bool bFatal = NewHealth <= 0;
+		if (!bFatal)
+		{
+			FGameplayTagContainer Tags;
+			Tags.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact")));
+			Props.TargetASC->TryActivateAbilitiesByTag(Tags);
+		}
+		else
+		{
+			if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
+			{
+				CombatInterface->Die();
+			}
+			SendXPEvent(Props);
+		}
+		const bool bBlock = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+		const bool bCrit = UAuraAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+			
+		ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCrit);
+
+		// handle debuff
+		if (UAuraAbilitySystemLibrary::IsSuccessfulDebuff(Props.EffectContextHandle))
+		{
+			HandleDebuff(Props);	
+		}
+	}
+}
+
+void UAuraAttributeSet::HandleIncomingXP(const FEffectProperties& Props)
+{
+	const float LocalIncomingXP = GetIncomingXP();
+	SetIncomingXP(0.f);
+	if (LocalIncomingXP > 0.f)
+	{
+		if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
+		{
+			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
+		}
+	}
+}
+
+/*
+ * Here we dynamically create Gameplay Effect using NewObject
+ * It is here mostly for education purposes as Dynamic GEs are limited,
+ * and are not supported for replication.
+ * So dynamic GEs are rarely used in a real game project.
+ */
+void UAuraAttributeSet::HandleDebuff(const FEffectProperties& Props)
+{
+	FGameplayEffectContextHandle EffectContext = Props.SourceASC->MakeEffectContext();
+	EffectContext.AddSourceObject(Props.SourceAvatarActor);
+
+	const FGameplayTag DamageType = UAuraAbilitySystemLibrary::GetDamageType(Props.EffectContextHandle);
+	const float DebuffDamage = UAuraAbilitySystemLibrary::GetDebuffDamage(Props.EffectContextHandle);
+	const float DebuffDuration = UAuraAbilitySystemLibrary::GetDebuffDuration(Props.EffectContextHandle);
+	const float DebuffFrequency = UAuraAbilitySystemLibrary::GetDebuffFrequency(Props.EffectContextHandle);
+	
+	FString DebuffName = FString::Printf(TEXT("DynamicDebuff %s"), *DamageType.ToString()); // name of the Dynamic Debuff
+	
+	// GetTransientPackage() is used as an Outer for objects created dynamically during gameplay that don't need to persist,
+	// you don't have a logical owner for an object, or when the object's lifespan is independent of other game objects
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(DebuffName));
+
+	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource;
+	Effect->StackLimitCount = 1;
+	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
+	Effect->Period = DebuffFrequency;
+	Effect->DurationMagnitude = FScalableFloat(DebuffDuration);
+	Effect->bExecutePeriodicEffectOnApplication = false;
+	
+	UTargetTagsGameplayEffectComponent& TargetTagsComponent = Effect->AddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer TagContainer;
+	TagContainer.Added.AddTag(FAuraGameplayTags::Get().DamageTypesToDebuffs[DamageType]); // Debuff Tag corresponding to the Damage Type
+	TargetTagsComponent.SetAndApplyTargetTagChanges(TagContainer);
+
+	FGameplayModifierInfo ModifierInfo;
+	ModifierInfo.Attribute = GetIncomingDamageAttribute();
+	ModifierInfo.ModifierOp = EGameplayModOp::Additive;
+	ModifierInfo.ModifierMagnitude = FGameplayEffectModifierMagnitude(DebuffDamage);
+	
+	Effect->Modifiers.Add(ModifierInfo);
+	
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))
+	{
+		if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(MutableSpec->GetContext().Get()))
+		{
+			AuraEffectContext->SetDamageType(MakeShared<FGameplayTag>(DamageType));
+
+			Props.TargetASC->ApplyGameplayEffectSpecToSelf(*MutableSpec);
+		}
 	}
 }
 

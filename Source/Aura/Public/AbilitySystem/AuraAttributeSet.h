@@ -59,6 +59,7 @@ public:
 	// Called just before any modification happens to an attribute. It affects current value.
 	// It is used when current value is modified by Duration non-periodic GE e.g. temporarily increasing MaxHealth
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+
 	// Affects base value. Used only to clamp values 
 	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
 	
@@ -238,6 +239,9 @@ private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
 	void ShowFloatingText(const FEffectProperties& Props, float DamageAmount, bool bBlockedHit, bool bCriticalHit) const;
 	void SendXPEvent(const FEffectProperties& Props);
+	void HandleIncomingDamage(const FEffectProperties& Props);
+	void HandleIncomingXP(const FEffectProperties& Props);
+	void HandleDebuff(const FEffectProperties& Props);
 	bool bTopOffHealth = false;
 	bool bTopOffMana = false;
 
