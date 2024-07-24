@@ -13,9 +13,19 @@ struct FAuraGameplayEffectContext : public FGameplayEffectContext
 public:
 	bool IsCriticalHit() const { return bIsCriticalHit; }
 	bool IsBlockedHit() const { return  bIsBlockedHit; }
+	bool IsSuccessfulDebuff() const { return bIsSuccessfulDebuff; }
+	float GetDebuffDamage() const { return DebuffDamage; }
+	float GetDebuffDuration() const { return DebuffDuration; }
+	float GetDebuffFrequency() const { return DebuffFrequency; }
+	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
 
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
+	void SetIsSuccessfulDebuff(bool bInIsDebuff) { bIsSuccessfulDebuff = bInIsDebuff; }
+	void SetDebuffDamage(float InDamage) { DebuffDamage = InDamage; }
+	void SetDebuffDuration(float InDuration) { DebuffDuration = InDuration; }
+	void SetDebuffFrequency(float InFrequency) { DebuffFrequency = InFrequency; }
+	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
 	
 	/** Returns the actual struct used for serialization, subclasses must override this! */
 	virtual UScriptStruct* GetScriptStruct() const override
@@ -38,6 +48,7 @@ public:
 	
 	/** Custom serialization, subclasses must override this */
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess) override;
+	
 protected:
 
 	UPROPERTY()
@@ -45,7 +56,37 @@ protected:
 	
 	UPROPERTY()
 	bool bIsCriticalHit = false;
+
+	UPROPERTY()
+	bool bIsSuccessfulDebuff = false;
 	
+	UPROPERTY()
+	float DebuffDamage = 0.f;
+
+	UPROPERTY()
+	float DebuffDuration = 0.f;
+
+	UPROPERTY()
+	float DebuffFrequency = 0.f;
+
+	// UPROPERTY macro is not used with smart pointers
+	TSharedPtr<FGameplayTag> DamageType;
+	
+};
+
+/** type traits to cover the custom aspects of a script struct **/
+template<>
+struct TStructOpsTypeTraits<FAuraGameplayEffectContext> : public TStructOpsTypeTraitsBase2<FAuraGameplayEffectContext>
+{
+	/* enums (treated as bools) allow the struct of type FAuraGameplayEffectContext to:
+	 * @WithNetSerializer - have a NetSerialize function for serializing its state to an FArchive used for network replication
+	 * @WithCopy - to be copied via its copy assignment operator
+	 */ 
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
 };
 
 USTRUCT(BlueprintType)
@@ -77,17 +118,4 @@ struct FDamageEffectParams
 	float DebuffFrequency = 0.f;
 };
 
-/** type traits to cover the custom aspects of a script struct **/
-template<>
-struct TStructOpsTypeTraits<FAuraGameplayEffectContext> : public TStructOpsTypeTraitsBase2<FAuraGameplayEffectContext>
-{
-	/* enums (treated as bools) allow the struct of type FAuraGameplayEffectContext to:
-	 * @WithNetSerializer - have a NetSerialize function for serializing its state to an FArchive used for network replication
-	 * @WithCopy - to be copied via its copy assignment operator
-	 */ 
-	enum
-	{
-		WithNetSerializer = true,
-		WithCopy = true
-	};
-};
+
