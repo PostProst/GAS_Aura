@@ -4,6 +4,7 @@
 #include "Character/AuraCharacterBase.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/AssetManager.h"
@@ -22,7 +23,10 @@ AAuraCharacterBase::AAuraCharacterBase()
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	WeaponMesh->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
+
+	BurnDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>("BurnNiagaraComponent");
+	BurnDebuffComponent->SetupAttachment(RootComponent);
+	BurnDebuffComponent->DebuffTag = FGameplayTag::RequestGameplayTag(FName("Debuff.Burn"));
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -216,6 +220,8 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	Dissolve();
+
+	OnDeathDelegate.Broadcast(this);
 }
 
 

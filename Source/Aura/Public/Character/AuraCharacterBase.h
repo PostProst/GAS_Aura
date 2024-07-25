@@ -8,6 +8,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AuraCharacterBase.generated.h"
 
+class UDebuffNiagaraComponent;
 class UNiagaraSystem;
 struct FStreamableHandle;
 class UGameplayAbility;
@@ -39,6 +40,8 @@ public:
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	virtual int32 GetMinionCount_Implementation() override;
 	virtual void IncrementMinionCount_Implementation(int32 Amount) override;
+	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() override { return OnASCRegistered; }
+	virtual FOnDeathSignature& GetOnDeathDelegate() override { return OnDeathDelegate; } 
 	/* end Combat Interface */
 	
 	UFUNCTION(NetMulticast, Reliable)
@@ -50,6 +53,9 @@ public:
 	TArray<FTaggedMontage> AttackMontages;
 
 	virtual ECharacterClass GetCharacterClass_Implementation() override;
+
+	FOnASCRegistered OnASCRegistered;
+	FOnDeathSignature OnDeathDelegate;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -121,6 +127,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UDebuffNiagaraComponent> BurnDebuffComponent;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Abilities")

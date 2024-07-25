@@ -110,6 +110,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
 	Cast<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
+	OnASCRegistered.Broadcast(AbilitySystemComponent);
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	AuraPlayerState->OnLevelChangedDelegate.AddUObject(this, &AAuraCharacter::OnLevelUp);
 
