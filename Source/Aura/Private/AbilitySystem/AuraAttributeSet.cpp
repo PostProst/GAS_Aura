@@ -94,13 +94,13 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
-
-	// return early if the Target is dead
-	if (Props.TargetCharacter->Implements<UCombatInterface>()
-		&& ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
 	
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
+		// return early if the Target is dead
+		if (Props.TargetCharacter->Implements<UCombatInterface>()
+			&& ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
+		
 		HandleIncomingDamage(Props);
 	}
 
@@ -144,15 +144,20 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		const bool bFatal = NewHealth <= 0;
 		if (!bFatal)
 		{
-			FGameplayTagContainer Tags;
-			Tags.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact")));
-			Props.TargetASC->TryActivateAbilitiesByTag(Tags);
+			// Check not to HitReact to Debuff Damage
+			FGameplayTagContainer TargetAssetTags = Props.EffectSpec.GetDynamicAssetTags();
+			if (!TargetAssetTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Debuff"))))
+			{
+				FGameplayTagContainer Tags;
+				Tags.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact")));
+				Props.TargetASC->TryActivateAbilitiesByTag(Tags);	
+			}
 		}
 		else
 		{
 			if(ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
 			{
-				CombatInterface->Die();
+				CombatInterface->Die(UAuraAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle));
 			}
 			SendXPEvent(Props);
 		}
@@ -213,7 +218,7 @@ void UAuraAttributeSet::HandleDebuff(const FEffectProperties& Props)
 	
 	UTargetTagsGameplayEffectComponent& TargetTagsComponent = Effect->AddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer TagContainer;
-	TagContainer.Added.AddTag(FAuraGameplayTags::Get().DamageTypesToDebuffs[DamageType]); // Debuff Tag corresponding to the Damage Type
+	TagContainer.Added.AddTag(FAuraGameplayTags::Get().DamageTypesToDebuffs[DamageType]); // Debuff Tag which will be applied to Target Actor
 	TargetTagsComponent.SetAndApplyTargetTagChanges(TagContainer);
 
 	FGameplayModifierInfo ModifierInfo;
@@ -225,6 +230,7 @@ void UAuraAttributeSet::HandleDebuff(const FEffectProperties& Props)
 	
 	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))
 	{
+		MutableSpec->AddDynamicAssetTag(FAuraGameplayTags::Get().DamageTypesToDebuffs[DamageType]); // Debuff Tag which will be added to Spec's DynamicTags
 		if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(MutableSpec->GetContext().Get()))
 		{
 			AuraEffectContext->SetDamageType(MakeShared<FGameplayTag>(DamageType));
@@ -261,6 +267,7 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 	*/
 	Props.EffectContextHandle = Data.EffectSpec.GetContext();
 	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+	Props.EffectSpec = Data.EffectSpec;
 	
 	if (IsValid(Props.SourceASC) &&
 		IsValid(Props.SourceASC->GetAvatarActor()) &&

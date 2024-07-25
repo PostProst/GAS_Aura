@@ -18,6 +18,7 @@ public:
 	float GetDebuffDuration() const { return DebuffDuration; }
 	float GetDebuffFrequency() const { return DebuffFrequency; }
 	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
+	FVector GetDeathImpulse() const { return DeathImpulse; }
 
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
@@ -26,6 +27,7 @@ public:
 	void SetDebuffDuration(float InDuration) { DebuffDuration = InDuration; }
 	void SetDebuffFrequency(float InFrequency) { DebuffFrequency = InFrequency; }
 	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
+	void SetDeathImpulse(const FVector& InDeathImpulse) { DeathImpulse = InDeathImpulse; }
 	
 	/** Returns the actual struct used for serialization, subclasses must override this! */
 	virtual UScriptStruct* GetScriptStruct() const override
@@ -71,6 +73,9 @@ protected:
 
 	// UPROPERTY macro is not used with smart pointers
 	TSharedPtr<FGameplayTag> DamageType;
+
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector;
 	
 };
 
@@ -107,15 +112,28 @@ struct FDamageEffectParams
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> TargetASC = nullptr;
 
+	UPROPERTY()
 	float BaseDamage = 0.f;
+	UPROPERTY()
 	float AbilityLevel = 1.f;
 	
+	UPROPERTY()
 	FGameplayTag DamageType = FGameplayTag();
-
+	
+	UPROPERTY()
 	float DebuffChance = 0.f;
+	UPROPERTY()
 	float DebuffDamage = 0.f;
+	UPROPERTY()
 	float DebuffDuration = 0.f;
+	UPROPERTY()
 	float DebuffFrequency = 0.f;
+
+	UPROPERTY()
+	float DeathImpulseMagnitude = 0.f;
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector;
+	
 };
 
 

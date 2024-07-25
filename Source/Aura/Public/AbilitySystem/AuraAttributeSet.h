@@ -22,6 +22,7 @@ struct FEffectProperties
 	FEffectProperties() {}
 	
 	FGameplayEffectContextHandle EffectContextHandle;
+	FGameplayEffectSpec EffectSpec;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> TargetASC = nullptr;
