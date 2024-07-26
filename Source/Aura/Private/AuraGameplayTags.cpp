@@ -54,6 +54,8 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Damage, "Debuff.Damage");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Frequency, "Debuff.Frequency");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Debuff_Duration, "Debuff.Duration");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Knockback_Chance, "Knockback.Chance");
+
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effects_HitReact, "Effects.HitReact");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_None, "Abilities.None");

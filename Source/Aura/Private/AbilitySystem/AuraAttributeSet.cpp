@@ -152,6 +152,15 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 				Tags.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact")));
 				Props.TargetASC->TryActivateAbilitiesByTag(Tags);	
 			}
+			// Knockback
+			if (UAuraAbilitySystemLibrary::IsSuccessfulKnockback(Props.EffectContextHandle))
+			{
+				if (Props.TargetCharacter)
+				{
+					const FVector LaunchVelocity = UAuraAbilitySystemLibrary::GetKnockbackImpulse(Props.EffectContextHandle);
+					Props.TargetCharacter->LaunchCharacter(LaunchVelocity, true, true);
+				}
+			}
 		}
 		else
 		{

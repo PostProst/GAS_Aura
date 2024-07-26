@@ -119,6 +119,14 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// Debuff
 	DetermineDebuff(ExecutionParams, Spec, EvaluationParameters, TagsToCaptureDefs);
 
+	// Knockback
+	const float KnockbackChance = Spec.GetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Knockback.Chance")), false, -1.f);
+	if (KnockbackChance > -1.f)
+	{
+		const bool bSuccessfulKnockback = KnockbackChance >= FMath::FRandRange(0.f, 100.f);
+		UAuraAbilitySystemLibrary::SetIsSuccessfulKnockback(EffectContextHandle, bSuccessfulKnockback);
+	}
+	
 	// Local Damage variable
 	float Damage = 0.f;
 	

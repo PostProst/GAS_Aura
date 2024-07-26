@@ -61,8 +61,6 @@ void AAuraProjectile::BeginPlay()
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
-	
 	if(!bHit) OnHit();
 	
 	if (HasAuthority())
@@ -77,9 +75,16 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 		// apply damage GameplayEffect
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
+			DamageEffectParams.TargetASC = TargetASC;
+			
 			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
 			DamageEffectParams.DeathImpulse = DeathImpulse;
-			DamageEffectParams.TargetASC = TargetASC;
+
+			FRotator Rotation = GetActorRotation();
+			Rotation.Pitch = 45.f;
+			const FVector KnockbackImpulse = Rotation.Vector() * DamageEffectParams.KnockbackMagnitude;
+			DamageEffectParams.KnockbackImpulse = KnockbackImpulse;
+			
 			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
 		

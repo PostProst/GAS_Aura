@@ -30,6 +30,17 @@ FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamsFromClassD
 	Params.DebuffDuration = DebuffDuration;
 	Params.DebuffFrequency = DebuffFrequency;
 	Params.DeathImpulseMagnitude = DeathImpulseMagnitude;
+	Params.KnockbackChance = KnockbackChance;
+	Params.KnockbackMagnitude = KnockbackMagnitude;
+	// Set Knockback and DeathImpulse vectors for non-projectile spells. Projectiles will override this in OnOverlap
+	if(IsValid(TargetActor))
+	{
+		FRotator Rotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
+		Rotation.Pitch = 45.f;
+		const FVector ToTarget = Rotation.Vector();
+		Params.KnockbackImpulse = ToTarget * KnockbackMagnitude;
+		Params.DeathImpulse = ToTarget * DeathImpulseMagnitude;
+	}
 	return Params;
 }
 
