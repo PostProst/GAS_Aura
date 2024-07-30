@@ -126,4 +126,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | DamageEffect")
 	static FGameplayEffectContextHandle ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams);
+
+	// helper functions to get evenly spread Vectors/Rotations for spawning projectiles
+	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary | Vector Math")
+	static TArray<FRotator> GetEvenlySpacedRotators(const FVector& ForwardVector, const FVector& Axis, float Spread, int32 NumRotators);
+
+	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary | Vector Math")
+	static TArray<FVector> GetEvenlyRotatedVectors(const FVector& ForwardVector, const FVector& Axis, float Spread, int32 NumVectors);
 };

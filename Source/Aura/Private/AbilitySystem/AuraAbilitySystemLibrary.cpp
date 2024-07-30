@@ -388,3 +388,55 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(const 
 	
 	return ContextHandle;
 }
+
+TArray<FRotator> UAuraAbilitySystemLibrary::GetEvenlySpacedRotators(const FVector& ForwardVector, const FVector& Axis, float Spread, int32 NumRotators)
+{
+	TArray<FRotator> Rotators;
+	
+	// take forward vector and rotate it left (negative value) by Spread degrees around specified axis
+	const FVector LeftOfSpread = ForwardVector.RotateAngleAxis(-Spread / 2, Axis);
+
+	// (NumRotators - 1) is to make Projectiles spawn at the edges of the spread
+	const float DeltaSpread = Spread / (NumRotators - 1);
+
+	if (NumRotators > 1)
+	{
+		for(int32 i = 0; i < NumRotators; i++)
+		{
+			// spawn each projectile starting from the LeftOfSpread and rotating it by DeltaSpread
+			FVector Direction = LeftOfSpread.RotateAngleAxis(DeltaSpread * i, Axis);
+			Rotators.Add(Direction.Rotation());
+		}
+	}
+	else
+	{
+		Rotators.Add(ForwardVector.Rotation());
+	}
+	return Rotators;
+}
+
+TArray<FVector> UAuraAbilitySystemLibrary::GetEvenlyRotatedVectors(const FVector& ForwardVector, const FVector& Axis, float Spread, int32 NumVectors)
+{
+	TArray<FVector> Vectors;
+	
+	// take forward vector and rotate it left (negative value) by Spread degrees around specified axis
+	const FVector LeftOfSpread = ForwardVector.RotateAngleAxis(-Spread / 2, Axis);
+
+	// (NumRotators - 1) is to make Projectiles spawn at the edges of the spread
+	const float DeltaSpread = Spread / (NumVectors - 1);
+
+	if (NumVectors > 1)
+	{
+		for(int32 i = 0; i < NumVectors; i++)
+		{
+			// spawn each projectile starting from the LeftOfSpread and rotating it by DeltaSpread
+			FVector Direction = LeftOfSpread.RotateAngleAxis(DeltaSpread * i, Axis);
+			Vectors.Add(Direction);
+		}
+	}
+	else
+	{
+		Vectors.Add(ForwardVector);
+	}
+	return Vectors;
+}
