@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "AuraPlayerController.generated.h"
 
+class UNiagaraSystem;
 class UDamageTextWidgetComponent;
 struct FInputActionValue;
 class UInputAction;
@@ -90,6 +91,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> MoveSpline;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;
 	/* end Click to move */
 
 	UPROPERTY(EditDefaultsOnly, Category="UI")
