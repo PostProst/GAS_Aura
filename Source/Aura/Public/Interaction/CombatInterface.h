@@ -90,4 +90,7 @@ public:
 
 	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() = 0;
 	virtual FOnDeathSignature& GetOnDeathDelegate() = 0;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetInShockLoop(bool bInShock);
 };
