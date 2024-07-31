@@ -28,6 +28,9 @@ public:
 
 	virtual void Destroyed() override;
 
+	UPROPERTY()
+	TObjectPtr<USceneComponent> HomingTargetSceneComponent = nullptr;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -49,5 +52,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USoundBase> LoopingSound;
+	
 
 };

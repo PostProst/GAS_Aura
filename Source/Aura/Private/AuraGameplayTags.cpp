@@ -73,6 +73,7 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Type_Passive, "Abilities.Type.Passive");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Type_None, "Abilities.Type.None");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Fire_FireBolt, "Abilities.Fire.FireBolt");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Fire_HomingFireballs, "Abilities.Fire.HomingFireballs");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Abilities_Lightning_Electrocute, "Abilities.Lightning.Electrocute");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Cooldown_Fire_FireBolt, "Cooldown.Fire.FireBolt");
