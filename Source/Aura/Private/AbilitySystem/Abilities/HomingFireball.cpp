@@ -1,7 +1,7 @@
 // P.S. project
 
 
-#include "HomingFireball.h"
+#include "AbilitySystem/Abilities/HomingFireball.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Actor/AuraProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
