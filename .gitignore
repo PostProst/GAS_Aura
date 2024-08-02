@@ -2,7 +2,7 @@
 .vs/
 
 Content/*
-Data/*
+!Content/Blueprints
 
 # Compiled Object files
 *.slo
