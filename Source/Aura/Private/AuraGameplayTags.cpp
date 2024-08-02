@@ -88,6 +88,11 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_2, "Montage.Attack.2");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_3, "Montage.Attack.3");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Montage_Attack_4, "Montage.Attack.4");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Player_Block_InputPressed, "Player.Block.InputPressed");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Player_Block_InputHeld, "Player.Block.InputHeld");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Player_Block_InputReleased, "Player.Block.InputReleased");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Player_Block_CursorTrace, "Player.Block.CursorTrace");
+
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;
 

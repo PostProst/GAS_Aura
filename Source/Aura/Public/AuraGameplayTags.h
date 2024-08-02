@@ -101,6 +101,11 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Montage_Attack_2);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Montage_Attack_3);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Montage_Attack_4);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Player_Block_InputPressed);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Player_Block_InputHeld);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Player_Block_InputReleased);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Player_Block_CursorTrace);
+
 struct FAuraGameplayTags
 {
 public:

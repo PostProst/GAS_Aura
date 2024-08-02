@@ -113,6 +113,16 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AAuraPlayerController::CursorTrace()
 {
+	// blocks cursor trace (when performing charged abilities for example)
+	if(GetASC() && GetASC()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.CursorTrace"))))
+	{
+		if (LastActor) LastActor->UnHighlightActor();
+		if (ThisActor) ThisActor->UnHighlightActor();
+		LastActor = nullptr;
+		ThisActor = nullptr;
+		return;
+	}
+	
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
@@ -137,6 +147,10 @@ void AAuraPlayerController::CursorTrace()
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if(GetASC() && GetASC()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputPressed"))))
+	{
+		return;
+	}
 	// if input is LMB (character is running)
 	if (InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
 	{
@@ -152,6 +166,10 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	if(GetASC() && GetASC()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputReleased"))))
+	{
+		return;
+	}
 	// input is not LMB - try activate ability
 	if (!InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
 	{
@@ -191,7 +209,10 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 					bAutoRunning = true;
 				}
 			}
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+			if(GetASC() && !GetASC()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputPressed"))))
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+			}
 		}
 		FollowTime = 0.f;
 		bTargeting = false;
@@ -200,6 +221,10 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	if(GetASC() && GetASC()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputHeld"))))
+	{
+		return;
+	}
 	// input is not LMB - try activate ability
 	if (!InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
 	{
@@ -237,5 +262,9 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 
 UAuraAbilitySystemComponent* AAuraPlayerController::GetASC()
 {
-	return AuraAbilitySystemComponent == nullptr ? TObjectPtr<UAuraAbilitySystemComponent>(Cast<UAuraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()))) : AuraAbilitySystemComponent;
+	if (AuraAbilitySystemComponent == nullptr)
+	{
+		return AuraAbilitySystemComponent = Cast<UAuraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return AuraAbilitySystemComponent;
 }
