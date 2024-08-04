@@ -34,6 +34,15 @@ UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+USkeletalMeshComponent* AAuraCharacterBase::GetWeapon_Implementation()
+{
+	if (WeaponMesh)
+	{
+		return WeaponMesh;
+	}
+	return nullptr;
+}
+
 void AAuraCharacterBase::BeginDestroy()
 {
 	Super::BeginDestroy();
