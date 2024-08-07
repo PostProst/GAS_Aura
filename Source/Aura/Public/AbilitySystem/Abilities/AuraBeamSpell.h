@@ -20,20 +20,32 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void StoreOwnerVariables();
+
+	UFUNCTION(BlueprintCallable)
+	void TraceFirstTarget(const FVector& BeamTargetLocation);
+
+	UFUNCTION(BlueprintCallable)
+	void StoreAdditionalTargets(TArray<AActor*>& OutTargets);
 	
 protected:
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Beam")
+	UPROPERTY(BlueprintReadWrite, Category="Beam")
 	FVector MouseHitLocation;
 
-	UPROPERTY(VisibleDefaultsOnly,BlueprintReadWrite, Category="Beam")
+	UPROPERTY(BlueprintReadWrite, Category="Beam")
 	TObjectPtr<AActor> HitActor;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Beam")
+	UPROPERTY(BlueprintReadWrite, Category="Beam")
 	TObjectPtr<APlayerController> OwnerPlayerController;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category="Beam")
+	UPROPERTY(BlueprintReadWrite, Category="Beam")
 	TObjectPtr<ACharacter> OwnerCharacter;
+
+	UPROPERTY(EditDefaultsOnly, Category="Beam")
+	float AdditionalTargetsRadius = 850.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Beam")
+	int32 MaxShockTargets = 5.f;
 	
 private:
 	
