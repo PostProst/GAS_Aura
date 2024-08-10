@@ -41,10 +41,12 @@ public:
 
 	UFUNCTION()
 	void OnLevelUp(int32 NewLevel);
-
+	
 protected:
 	virtual void InitAbilityActorInfo() override;
-
+	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+	virtual void OnRep_Stunned() override;
+	
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArmComponent;

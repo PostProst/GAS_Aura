@@ -103,6 +103,25 @@ void AAuraCharacter::OnLevelUp(int32 NewLevel)
 	MulticastLevelUpParticles();
 }
 
+// As dynamic gameplay effects are not replicated when we create debuff GE in AttributeSet
+// we need to disable input on clients in OnRep_Stunned
+void AAuraCharacter::OnRep_Stunned()
+{
+	FGameplayTagContainer BlockedTags;
+	BlockedTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputPressed")));
+	BlockedTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputHeld")));
+	BlockedTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputReleased")));
+	BlockedTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.CursorTrace")));
+	if(bIsStunned)
+	{
+		AbilitySystemComponent->AddLooseGameplayTags(BlockedTags);
+	}
+	else
+	{
+		AbilitySystemComponent->RemoveLooseGameplayTags(BlockedTags);
+	}
+}
+
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
@@ -111,6 +130,9 @@ void AAuraCharacter::InitAbilityActorInfo()
 	Cast<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
+	AbilitySystemComponent->RegisterGameplayTagEvent(
+		FGameplayTag::RequestGameplayTag(FName("Debuff.Stun")),
+		EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAuraCharacter::StunTagChanged);
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	AuraPlayerState->OnLevelChangedDelegate.AddUObject(this, &AAuraCharacter::OnLevelUp);
 
@@ -124,3 +146,10 @@ void AAuraCharacter::InitAbilityActorInfo()
 	/* Initialize Primary and Secondary Attributes with a Gameplay Effect */
 	InitializeDefaultAttributes();
 }
+
+void AAuraCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	Super::StunTagChanged(CallbackTag, NewCount);
+
+}
+

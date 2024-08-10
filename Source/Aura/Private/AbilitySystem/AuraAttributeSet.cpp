@@ -208,6 +208,7 @@ void UAuraAttributeSet::HandleDebuff(const FEffectProperties& Props)
 	EffectContext.AddSourceObject(Props.SourceAvatarActor);
 
 	const FGameplayTag DamageType = UAuraAbilitySystemLibrary::GetDamageType(Props.EffectContextHandle);
+	const FGameplayTag DebuffTag = FAuraGameplayTags::Get().DamageTypesToDebuffs[DamageType];
 	const float DebuffDamage = UAuraAbilitySystemLibrary::GetDebuffDamage(Props.EffectContextHandle);
 	const float DebuffDuration = UAuraAbilitySystemLibrary::GetDebuffDuration(Props.EffectContextHandle);
 	const float DebuffFrequency = UAuraAbilitySystemLibrary::GetDebuffFrequency(Props.EffectContextHandle);
@@ -227,7 +228,15 @@ void UAuraAttributeSet::HandleDebuff(const FEffectProperties& Props)
 	
 	UTargetTagsGameplayEffectComponent& TargetTagsComponent = Effect->AddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer TagContainer;
-	TagContainer.Added.AddTag(FAuraGameplayTags::Get().DamageTypesToDebuffs[DamageType]); // Debuff Tag which will be applied to Target Actor
+	TagContainer.Added.AddTag(DebuffTag); // Debuff Tag which will be applied to Target Actor
+	// block player input if debuff is stun
+	if (DebuffTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("Debuff.Stun"))))
+	{
+		TagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputPressed")));
+		TagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputHeld")));
+		TagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputReleased")));
+		TagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.CursorTrace")));
+	}
 	TargetTagsComponent.SetAndApplyTargetTagChanges(TagContainer);
 
 	FGameplayModifierInfo ModifierInfo;

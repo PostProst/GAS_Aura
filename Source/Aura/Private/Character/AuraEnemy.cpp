@@ -32,6 +32,8 @@ AAuraEnemy::AAuraEnemy()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+
+	BaseWalkSpeed = 250.f;
 }
 
 void AAuraEnemy::PossessedBy(AController* NewController)
@@ -91,6 +93,9 @@ void AAuraEnemy::BeginPlay()
 			this,
 			&AAuraEnemy::HitReactTagChanged
 		);
+		AbilitySystemComponent->RegisterGameplayTagEvent(
+		FGameplayTag::RequestGameplayTag(FName("Debuff.Stun")),
+		EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAuraEnemy::StunTagChanged);
 	}
 }
 
@@ -157,6 +162,15 @@ void AAuraEnemy::Die(const FVector& DeathImpulse)
 void AAuraEnemy::InitializeDefaultAttributes() const
 {
 	UAuraAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+}
+
+void AAuraEnemy::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	Super::StunTagChanged(CallbackTag, NewCount); // super call sets max walk speed and bIsStunned var
+	if (AuraAIController && AuraAIController->GetBlackboardComponent())
+	{
+		AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("bIsStunned"), bIsStunned);	
+	}
 }
 
 
