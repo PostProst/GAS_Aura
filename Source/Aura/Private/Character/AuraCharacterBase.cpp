@@ -26,15 +26,22 @@ AAuraCharacterBase::AAuraCharacterBase()
 	WeaponMesh->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	/* Debuff components */
 	BurnDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>("BurnNiagaraComponent");
 	BurnDebuffComponent->SetupAttachment(RootComponent);
 	BurnDebuffComponent->DebuffTag = FGameplayTag::RequestGameplayTag(FName("Debuff.Burn"));
+
+	StunDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>("StunNiagaraComponent");
+	StunDebuffComponent->SetupAttachment(RootComponent);
+	StunDebuffComponent->DebuffTag = FGameplayTag::RequestGameplayTag(FName("Debuff.Stun"));
+	/* end debuff components */
 }
 
 void AAuraCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AAuraCharacterBase, bIsStunned);
+	DOREPLIFETIME(AAuraCharacterBase, bIsBurned);
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -78,6 +85,10 @@ void AAuraCharacterBase::StunTagChanged(const FGameplayTag CallbackTag, int32 Ne
 }
 
 void AAuraCharacterBase::OnRep_Stunned()
+{
+}
+
+void AAuraCharacterBase::OnRep_Burned()
 {
 }
 

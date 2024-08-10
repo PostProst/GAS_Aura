@@ -2,7 +2,7 @@
 
 
 #include "Character/AuraCharacter.h"
-
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "AbilitySystemComponent.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
@@ -115,10 +115,24 @@ void AAuraCharacter::OnRep_Stunned()
 	if(bIsStunned)
 	{
 		AbilitySystemComponent->AddLooseGameplayTags(BlockedTags);
+		StunDebuffComponent->Activate();
 	}
 	else
 	{
 		AbilitySystemComponent->RemoveLooseGameplayTags(BlockedTags);
+		StunDebuffComponent->Deactivate();
+	}
+}
+
+void AAuraCharacter::OnRep_Burned()
+{
+	if (bIsBurned)
+	{
+		BurnDebuffComponent->Activate();
+	}
+	else
+	{
+		BurnDebuffComponent->Deactivate();
 	}
 }
 

@@ -46,6 +46,7 @@ protected:
 	virtual void InitAbilityActorInfo() override;
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	virtual void OnRep_Stunned() override;
+	virtual void OnRep_Burned() override;
 	
 private:
 	UPROPERTY(VisibleAnywhere)
