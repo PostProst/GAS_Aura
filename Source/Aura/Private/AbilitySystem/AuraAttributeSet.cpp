@@ -148,9 +148,13 @@ void UAuraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 			FGameplayTagContainer TargetAssetTags = Props.EffectSpec.GetDynamicAssetTags();
 			if (!TargetAssetTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Debuff"))))
 			{
-				FGameplayTagContainer Tags;
-				Tags.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact")));
-				Props.TargetASC->TryActivateAbilitiesByTag(Tags);	
+				// Check not to HitReact when target is in Shock Loop
+				if(Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsInShock(Props.TargetCharacter))
+				{
+					FGameplayTagContainer Tags;
+					Tags.AddTag(UGameplayTagsManager::Get().RequestGameplayTag(FName("Effects.HitReact")));
+					Props.TargetASC->TryActivateAbilitiesByTag(Tags);	
+				}
 			}
 			// Knockback
 			if (UAuraAbilitySystemLibrary::IsSuccessfulKnockback(Props.EffectContextHandle))
