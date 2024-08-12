@@ -77,7 +77,7 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 		return;
 	}
 	SelectedAbility.AbilityTag = AbilityTag;
-	if (FGameplayAbilitySpec* AbilitySpec = GetAuraASC()->GetAbilitySpecFromTag(AbilityTag))
+	if (FGameplayAbilitySpec* AbilitySpec = GetAuraASC()->GetAbilitySpecFromAbilityTag(AbilityTag))
 	{
 		SelectedAbility.StatusTag = GetAuraASC()->GetAbilityStatusFromSpec(*AbilitySpec);
 	}

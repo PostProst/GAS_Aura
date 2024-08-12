@@ -45,7 +45,13 @@ public:
 	FGameplayTag GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag);
 	static FGameplayTag GetAbilityStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	FGameplayTag GetAbilityStatusFromTag(const FGameplayTag& AbilityTag);
-	FGameplayAbilitySpec* GetAbilitySpecFromTag(const FGameplayTag& AbilityTag);
+	FGameplayAbilitySpec* GetAbilitySpecFromAbilityTag(const FGameplayTag& AbilityTag);
+	FGameplayAbilitySpec* GetAbilitySpecFromInputTag(const FGameplayTag& InputTag);
+	bool IsInputTagOccupied(const FGameplayTag& InputTag);
+	static bool AbilityHasInputTag(const FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& InputTag);
+	static bool AbilityHasAnyInputTag(const FGameplayAbilitySpec& AbilitySpec);
+	bool IsPassiveAbility(const FGameplayAbilitySpec& AbilitySpec) const;
+	static void AssignInputTagToAbility(FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& InputTag);
 
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 
@@ -64,7 +70,7 @@ public:
 	void ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PreviousInputTag);
 
 	bool GetDescriptionsForTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLvlDescription);
-	void ClearInputTag(FGameplayAbilitySpec* Spec);
+	static void ClearInputTag(FGameplayAbilitySpec* Spec);
 	void ClearAbilitiesOfInputTag(const FGameplayTag& InputTag);
 	
 protected:
