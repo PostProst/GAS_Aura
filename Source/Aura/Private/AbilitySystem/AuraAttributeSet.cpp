@@ -193,7 +193,7 @@ void UAuraAttributeSet::HandleIncomingXP(const FEffectProperties& Props)
 	SetIncomingXP(0.f);
 	if (LocalIncomingXP > 0.f)
 	{
-		if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
+		if (Props.SourceCharacter->Implements<UPlayerInterface>())
 		{
 			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
 		}
