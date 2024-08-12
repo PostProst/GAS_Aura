@@ -89,6 +89,10 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Fire_FireBolt);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Fire_HomingFireballs);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Lightning_Electrocute);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Passive_HaloOfProtection);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Passive_LifeSiphon);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Abilities_Passive_ManaSiphon);
+
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Cooldown_Fire_FireBolt);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_CombatSocket_Weapon);
