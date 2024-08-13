@@ -297,16 +297,19 @@ void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 			{
 				if (FGameplayAbilitySpec* SpecWithInputTag = GetAbilitySpecFromInputTag(InputTag))
 				{
+					const FGameplayTag& OccupiedAbilityTag = GetAbilityTagFromSpec(*SpecWithInputTag);
+					
 					// return early if occupied ability and the one we want to equip are the same
-					if (AbilityTag.MatchesTagExact(GetAbilityTagFromSpec(*SpecWithInputTag)))
+					if (AbilityTag.MatchesTagExact(OccupiedAbilityTag))
 					{
 						ClientEquipAbility(AbilityTag, EquippedTag, InputTag, PreviousInputTag);
 						return;
 					}
+					// deactivate passive ability
 					if (IsPassiveAbility(*SpecWithInputTag))
 					{
-						DeactivatePassiveAbilityDelegate.Broadcast(GetAbilityTagFromSpec(*SpecWithInputTag));
-						
+						DeactivatePassiveAbilityDelegate.Broadcast(OccupiedAbilityTag);
+						MulticastActivatePassiveEffect(OccupiedAbilityTag, false);
 					}
 					ClearInputTag(SpecWithInputTag);
 				}
@@ -319,6 +322,7 @@ void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 				if (IsPassiveAbility(*AbilitySpec))
 				{
 					TryActivateAbility(AbilitySpec->Handle);
+					MulticastActivatePassiveEffect(AbilityTag, true);
 				}
 			}
 
@@ -340,6 +344,12 @@ void UAuraAbilitySystemComponent::ClientEquipAbility_Implementation(const FGamep
 	const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PreviousInputTag)
 {
 	AbilityEquippedDelegate.Broadcast(AbilityTag, StatusTag, InputTag, PreviousInputTag);
+}
+
+void UAuraAbilitySystemComponent::MulticastActivatePassiveEffect_Implementation(const FGameplayTag& AbilityTag,
+	bool bActivate)
+{
+	ActivatePassiveEffect.Broadcast(AbilityTag, bActivate);
 }
 
 bool UAuraAbilitySystemComponent::GetDescriptionsForTag(const FGameplayTag& AbilityTag, FString& OutDescription,

@@ -1,7 +1,7 @@
 // P.S. project
 
 
-#include "AuraPassiveAbility.h"
+#include "AbilitySystem/Abilities/AuraPassiveAbility.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 

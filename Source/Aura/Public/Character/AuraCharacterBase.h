@@ -16,6 +16,7 @@ class UGameplayEffect;
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UAnimMontage;
+class UPassiveNiagaraComponent;
 
 // 'Abstract' keyword means that the class is intended to be a base class for other classes
 // and is not meant to be instantiated on its own.
@@ -152,7 +153,21 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UDebuffNiagaraComponent> StunDebuffComponent;
+	
+	// Buff Niagara components
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UPassiveNiagaraComponent> HaloOfProtectionNiagaraComponent;
 
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UPassiveNiagaraComponent> LifeSiphonNiagaraComponent;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UPassiveNiagaraComponent> ManaSiphonNiagaraComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> EffectAttachComponent;
+	/* end Niagara Components */
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat")
 	float BaseWalkSpeed = 600.f;
 	
