@@ -10,7 +10,8 @@ AMagicCircle::AMagicCircle()
 	PrimaryActorTick.bCanEverTick = false;
 
 	MagicCircleDecal = CreateDefaultSubobject<UDecalComponent>("Magic Circle Decal");
-	MagicCircleDecal->SetupAttachment(RootComponent);
+	SetRootComponent(MagicCircleDecal);
+	//MagicCircleDecal->SetupAttachment(RootComponent);
 }
 
 
