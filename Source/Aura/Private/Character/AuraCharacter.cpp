@@ -88,6 +88,22 @@ void AAuraCharacter::AddToSpellPoints_Implementation(int32 InSpellPoints)
 	}
 }
 
+void AAuraCharacter::ShowMagicCircle_Implementation(UMaterialInterface* DecalMaterial)
+{
+	if (AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(Controller))
+	{
+		AuraPC->ShowMagicCircle(DecalMaterial);
+	}
+}
+
+void AAuraCharacter::HideMagicCircle_Implementation()
+{
+	if (AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(Controller))
+	{
+		AuraPC->HideMagicCircle();
+	}
+}
+
 void AAuraCharacter::MulticastLevelUpParticles_Implementation() const
 {
 	check(LevelUpNiagaraComponent);
