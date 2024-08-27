@@ -62,6 +62,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();
 
+	// pure virtual functions can be defined in UINTERFACE as long as they are only used in C++
 	virtual void Die(const FVector& DeathImpulse) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
