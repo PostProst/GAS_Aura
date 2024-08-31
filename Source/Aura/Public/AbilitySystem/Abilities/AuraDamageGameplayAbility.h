@@ -50,17 +50,28 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Debuff")
 	float DebuffDuration = 5.f;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Knockback")
 	float DeathImpulseMagnitude = 1000.f;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Knockback")
 	float KnockbackChance = 0.f;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Knockback")
 	float KnockbackMagnitude = 1000.f;
 	
-
 	UFUNCTION(BlueprintPure)
 	float GetDamage(int32 Level, FGameplayTag DamageTypeTag);
+
+	UPROPERTY(EditDefaultsOnly, Category="Radial Damage")
+	bool bIsRadialDamage = false;
+
+	UPROPERTY(EditDefaultsOnly, Category="Radial Damage")
+	float RadialDamageInnerRadius = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Radial Damage")
+	float RadialDamageOuterRadius = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Radial Damage")
+	FVector RadialDamageOrigin = FVector::ZeroVector;
 	
 };
