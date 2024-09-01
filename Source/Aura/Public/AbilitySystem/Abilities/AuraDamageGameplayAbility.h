@@ -65,13 +65,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Radial Damage")
 	bool bIsRadialDamage = false;
 
-	UPROPERTY(EditDefaultsOnly, Category="Radial Damage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Radial Damage")
 	float RadialDamageInnerRadius = 0.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Radial Damage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Radial Damage")
 	float RadialDamageOuterRadius = 0.f;
 
-	UPROPERTY(EditDefaultsOnly, Category="Radial Damage")
+	UPROPERTY(BlueprintReadWrite, Category="Radial Damage")
 	FVector RadialDamageOrigin = FVector::ZeroVector;
 	
 };

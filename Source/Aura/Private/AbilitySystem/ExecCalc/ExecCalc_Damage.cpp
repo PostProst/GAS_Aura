@@ -143,6 +143,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 		// Get the damage associated with the Damage Type Tag from the AbilitySpec
 		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTypeTag, false);
+		// skip this iteration of the loop if the Damage for this DamageType is not set
+		if (DamageTypeValue <= 0.f) continue;
 
 		// Capture Resistance Attribute Magnitude
 		float Resistance = 0.f;
@@ -152,6 +154,32 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		// Reduce the DamageTypeValue by Resistance percent
 		DamageTypeValue *= (100.f - Resistance) / 100.f;
 
+		// Calculate radial damage falloff
+		if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
+		{
+			FVector TargetLocation = TargetAvatar->GetActorLocation();
+			const FVector RadialOrigin = UAuraAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle);
+			TargetLocation.Z = RadialOrigin.Z; // TargetAvatar halfheight may be above the InnerRadius
+
+			// Udemy comment suggested using square numbers to avoid heavy squareroot calculations
+			const float Distance = FVector::Distance(TargetLocation, RadialOrigin);
+			const float InnerRadius = UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle);
+			const float OuterRadius = UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle);
+
+			// out of bounds - don't do any damage
+			if (Distance > OuterRadius) return;
+			// inside the InnerRadius - do max damage
+			if (Distance <= InnerRadius)
+			{
+				Damage += DamageTypeValue;
+				continue;
+			}
+			// between Inner and Outer radius, calculate linear percentage falloff
+			const TRange<float> DistanceRange(InnerRadius, OuterRadius);
+			const TRange<float> DamageScaleRange(1.f, 0.f);
+			const float DamageScalar = FMath::GetMappedRangeValueClamped(DistanceRange, DamageScaleRange, Distance);
+			DamageTypeValue *= DamageScalar;
+		}
 		// Set the total damage value
 		Damage += DamageTypeValue;
 	}
