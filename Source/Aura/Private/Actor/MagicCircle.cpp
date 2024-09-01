@@ -3,6 +3,8 @@
 
 #include "Actor/MagicCircle.h"
 #include "Components/DecalComponent.h"
+#include "Components/SphereComponent.h"
+#include "Interaction/EnemyInterface.h"
 
 
 AMagicCircle::AMagicCircle()
@@ -11,20 +13,38 @@ AMagicCircle::AMagicCircle()
 
 	MagicCircleDecal = CreateDefaultSubobject<UDecalComponent>("Magic Circle Decal");
 	SetRootComponent(MagicCircleDecal);
-	//MagicCircleDecal->SetupAttachment(RootComponent);
+	
+	OverlapSphere = CreateDefaultSubobject<USphereComponent>("Overlap Sphere");
+	OverlapSphere->SetupAttachment(RootComponent);
+	OverlapSphere->SetGenerateOverlapEvents(true);
+	OverlapSphere->SetCollisionEnabled(ECollisionEnabled::Type::QueryOnly);
+	OverlapSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	OverlapSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
 
 void AMagicCircle::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	OverlapSphere->OnComponentBeginOverlap.AddDynamic(this, &AMagicCircle::OnSphereBeginOverlap);
+	OverlapSphere->OnComponentEndOverlap.AddDynamic(this, &AMagicCircle::OnSphereEndOverlap);
 }
 
-
-void AMagicCircle::Tick(float DeltaTime)
+void AMagicCircle::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaTime);
+	if (IEnemyInterface* EnemyInterface = Cast<IEnemyInterface>(OtherActor))
+	{
+		EnemyInterface->HighlightActor();
+	}
+}
 
+void AMagicCircle::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (IEnemyInterface* EnemyInterface = Cast<IEnemyInterface>(OtherActor))
+	{
+		EnemyInterface->UnHighlightActor();
+	}
 }
 

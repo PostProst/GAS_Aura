@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "MagicCircle.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class AURA_API AMagicCircle : public AActor
 {
@@ -14,7 +16,6 @@ class AURA_API AMagicCircle : public AActor
 public:	
 	
 	AMagicCircle();
-	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UDecalComponent> MagicCircleDecal;
@@ -23,9 +24,14 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USphereComponent> OverlapSphere;
 	
 private:	
-	
-	
+
+	UFUNCTION()
+	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 };
