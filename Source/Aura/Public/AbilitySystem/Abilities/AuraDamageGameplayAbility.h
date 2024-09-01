@@ -20,7 +20,14 @@ public:
 	void CauseDamage(AActor* TargetActor);
 
 	UFUNCTION(BlueprintPure)
-	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(
+		AActor* TargetActor = nullptr,
+		bool bOverrideKnockbackImpulse = false,
+		FVector KnockbackImpulseOverride = FVector::ZeroVector,
+		bool bOverrideDeathImpulse = false,
+		FVector DeathImpulseOverride = FVector::ZeroVector,
+		bool bOverridePitch = false,
+		float PitchOverride = 0.f) const;
 
 protected:
 
@@ -50,13 +57,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Debuff")
 	float DebuffDuration = 5.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Knockback")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Knockback")
 	float DeathImpulseMagnitude = 1000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category="Knockback")
 	float KnockbackChance = 0.f;
 
-	UPROPERTY(EditDefaultsOnly, Category="Knockback")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Knockback")
 	float KnockbackMagnitude = 1000.f;
 	
 	UFUNCTION(BlueprintPure)
