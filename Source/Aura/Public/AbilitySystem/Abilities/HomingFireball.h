@@ -22,7 +22,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Homing Projectile")
 	float ProjectileSpread = 90.f;
 
-	UPROPERTY(EditDefaultsOnly, Category="Homing Projectile")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Homing Projectile")
 	FRuntimeFloatCurve ProjectilesCurve;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Homing Projectile")

@@ -50,10 +50,10 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category="Beam")
 	TObjectPtr<ACharacter> OwnerCharacter;
 
-	UPROPERTY(EditDefaultsOnly, Category="Beam")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Beam")
 	float AdditionalTargetsRadius = 850.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Beam")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Beam")
 	int32 MaxShockTargets = 5.f;
 	
 private:
