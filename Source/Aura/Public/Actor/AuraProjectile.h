@@ -41,12 +41,14 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> Sphere;
+
+	bool IsValidOverlap(const AActor* TargetActor) const;
+	
+    bool bHit = false;
 	
 private:
 	
 	// impact cosmetic effects
-	bool bHit = false;
-	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UNiagaraSystem> ImpactEffect;
 	

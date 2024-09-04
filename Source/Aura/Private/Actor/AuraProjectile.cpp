@@ -65,12 +65,7 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	
 	if (HasAuthority())
 	{
-		AActor* SourceAvatarActor = DamageEffectParams.SourceASC->GetAvatarActor();
-	
-		// prevents overlapping with self
-		if(SourceAvatarActor == OtherActor) return;
-		// prevents friendly fire
-		if (UAuraAbilitySystemLibrary::IsFriend(SourceAvatarActor, OtherActor)) return;
+		if (!IsValidOverlap(OtherActor)) return;
 		
 		// apply damage GameplayEffect
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
@@ -91,6 +86,18 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 		Destroy();
 	}
 	else bHit = true;
+}
+
+bool AAuraProjectile::IsValidOverlap(const AActor* TargetActor) const
+{
+	if (DamageEffectParams.SourceASC == nullptr) return false;
+	AActor* SourceAvatarActor = DamageEffectParams.SourceASC->GetAvatarActor();
+	// prevents overlapping with self
+	if(SourceAvatarActor == TargetActor) return false;
+	// prevents friendly fire
+	if (UAuraAbilitySystemLibrary::IsFriend(SourceAvatarActor, TargetActor)) return false;
+	
+	return true;
 }
 
 
