@@ -21,6 +21,8 @@ public:
 	// Additional DamageEffectParams for exploding on the way back
 	UPROPERTY(BlueprintReadWrite)
 	FDamageEffectParams ExplosionDamageParams;
+
+	virtual void OnHit() override;
 	
 protected:
 	virtual void BeginPlay() override;

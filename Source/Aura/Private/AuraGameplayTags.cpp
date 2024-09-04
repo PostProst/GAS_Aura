@@ -99,6 +99,8 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Player_Block_InputHeld, "Player.Block.InputHeld");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Player_Block_InputReleased, "Player.Block.InputReleased");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Player_Block_CursorTrace, "Player.Block.CursorTrace");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_GameplayCue_FireBlast, "GameplayCue.FireBlast");
+
 // static variables must be explicitly defined
 FAuraGameplayTags FAuraGameplayTags::GameplayTags;
 

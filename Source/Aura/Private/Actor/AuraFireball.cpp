@@ -3,7 +3,24 @@
 
 #include "Actor/AuraFireball.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayCueManager.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+
+void AAuraFireball::OnHit()
+{
+	// When we have some entity that is already replicated
+	// (in this case Fireball is replicated and OnHit() is called in AuraProjectile's Destroyed()),
+	// it is a good practice to execute NonReplicated GameplayCues to save on bandwidth and do not use unnecessary RPCs.
+	// Execution of these GameplayCues will still be propagated to all clients
+	if(IsValid(GetInstigator()))
+	{
+		FGameplayCueParameters Params;
+		Params.Location = GetActorLocation();
+		UGameplayCueManager::ExecuteGameplayCue_NonReplicated(GetInstigator(), FGameplayTag::RequestGameplayTag(FName("GameplayCue.FireBlast")), Params);
+	}
+	
+	bHit = true;
+}
 
 void AAuraFireball::BeginPlay()
 {

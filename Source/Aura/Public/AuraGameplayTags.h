@@ -112,6 +112,8 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Player_Block_InputHeld);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Player_Block_InputReleased);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Player_Block_CursorTrace);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_GameplayCue_FireBlast);
+
 struct FAuraGameplayTags
 {
 public:

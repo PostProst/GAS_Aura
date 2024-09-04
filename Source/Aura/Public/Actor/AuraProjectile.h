@@ -20,7 +20,7 @@ public:
 	AAuraProjectile();
 
 	UFUNCTION(BlueprintCallable)
-	void OnHit();
+	virtual void OnHit();
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
@@ -46,8 +46,6 @@ protected:
 	
     bool bHit = false;
 	
-private:
-	
 	// impact cosmetic effects
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UNiagaraSystem> ImpactEffect;
@@ -57,6 +55,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USoundBase> LoopingSound;
+	
+private:
+	
+
 	
 
 };
