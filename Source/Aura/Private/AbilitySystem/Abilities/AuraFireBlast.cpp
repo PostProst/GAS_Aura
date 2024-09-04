@@ -30,7 +30,8 @@ TArray<AAuraFireball*> UAuraFireBlast::SpawnFireballs()
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 			);
 
-		Fireball->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
+		Fireball->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults(); // applied on Fireball overlap
+		Fireball->ExplosionDamageParams = MakeDamageEffectParamsFromClassDefaults(); // applied on explosion (radial damage)
 
 		Fireballs.Add(Fireball);
 
