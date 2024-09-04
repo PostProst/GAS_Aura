@@ -18,6 +18,8 @@ class AURA_API AAuraProjectile : public AActor
 	
 public:	
 	AAuraProjectile();
+
+	UFUNCTION(BlueprintCallable)
 	void OnHit();
 
 	UPROPERTY(VisibleAnywhere)
