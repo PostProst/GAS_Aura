@@ -28,7 +28,7 @@ public:
 
 	// WidgetSwither's button callbacks
 	UFUNCTION(BlueprintCallable)
-	void AddNewSlotButtonPressed(int32 Slot, const FString& EnteredName);
+	void NewSlotButtonPressed(int32 Slot, const FString& EnteredName);
 
 	UFUNCTION(BlueprintCallable)
 	void NewGameButtonPressed(int32 Slot);
