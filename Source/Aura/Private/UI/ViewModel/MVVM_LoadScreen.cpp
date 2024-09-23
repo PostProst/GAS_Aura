@@ -38,7 +38,7 @@ void UMVVM_LoadScreen::NewSlotButtonPressed(int32 Slot)
 
 void UMVVM_LoadScreen::NewGameButtonPressed(int32 Slot)
 {
-	LoadSlotsMap[Slot]->SetWidgetSwitcherIndexDelegate.Broadcast(2);
+	LoadSlotsMap[Slot]->SetWidgetSwitcherIndexDelegate.Broadcast(1);
 }
 
 void UMVVM_LoadScreen::SelectSlotButtonPressed(int32 Slot)
