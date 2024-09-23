@@ -28,7 +28,7 @@ public:
 
 	// WidgetSwither's button callbacks
 	UFUNCTION(BlueprintCallable)
-	void NewSlotButtonPressed(int32 Slot, const FString& EnteredName);
+	void NewSlotButtonPressed(int32 Slot);
 
 	UFUNCTION(BlueprintCallable)
 	void NewGameButtonPressed(int32 Slot);
@@ -47,4 +47,14 @@ private:
 	TObjectPtr<UMVVM_LoadSlot> LoadSlot_1;
 	UPROPERTY()
 	TObjectPtr<UMVVM_LoadSlot> LoadSlot_2;
+
+
+	// Field notify
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess=true))
+	int32 NumLoadSlots;
+
+public:
+	
+	void SetNumLoadSlots(int32 InSlots) { UE_MVVM_SET_PROPERTY_VALUE(NumLoadSlots, InSlots); }
+	int32 GetNumLoadSlots() const { return NumLoadSlots; }
 };

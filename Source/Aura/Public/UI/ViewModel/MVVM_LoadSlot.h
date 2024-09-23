@@ -24,12 +24,22 @@ public:
 	void InitializeSlot();
 
 	UPROPERTY()
-	FString PlayerName = FString();
-	
-	UPROPERTY()
-	FString LoadSlotName = FString();
-
-	UPROPERTY()
 	int32 LoadSlotIndex = 0;
+
+private:
 	
+	/* Field notifies */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess=true))
+	FText PlayerName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess=true))
+	FString LoadSlotName;
+
+public:
+	
+	void SetPlayerName(const FText& InPlayerName) { UE_MVVM_SET_PROPERTY_VALUE(PlayerName, InPlayerName); }
+	FText GetPlayerName() const { return PlayerName; }
+
+	void SetLoadSlotName(const FString& InLoadSlotName) { UE_MVVM_SET_PROPERTY_VALUE(LoadSlotName, InLoadSlotName); }
+	FString GetLoadSlotName() const { return LoadSlotName; }
 };
