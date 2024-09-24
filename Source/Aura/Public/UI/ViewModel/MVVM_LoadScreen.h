@@ -6,6 +6,8 @@
 #include "MVVMViewModelBase.h"
 #include "MVVM_LoadScreen.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotSelected);
+
 class UMVVM_LoadSlot;
 /**
  * 
@@ -22,6 +24,9 @@ public:
 
 	void InitializeLoadSlotViewModels();
 
+	UPROPERTY(BlueprintAssignable)
+	FSlotSelected SlotSelectedDelegate;
+
 	UFUNCTION(BlueprintPure)
 	UMVVM_LoadSlot* GetLoadSlotViewModelByIndex(int32 Index) const;
 
@@ -35,6 +40,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SelectSlotButtonPressed(int32 Slot);
+
+	UFUNCTION(BlueprintCallable)
+	void BackButtonPressed();
 
 	void LoadData();
 	
@@ -51,12 +59,12 @@ private:
 	TObjectPtr<UMVVM_LoadSlot> LoadSlot_2;
 
 
-	// Field notify
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess=true))
-	int32 NumLoadSlots;
+	// Field notifies
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter = "SetPlayAndDeleteButtonsEnabled", Getter = "GetPlayAndDeleteButtonsEnabled", meta=(AllowPrivateAccess=true))
+	bool bEnablePlayAndDeleteButtons = false;
 
 public:
-	
-	void SetNumLoadSlots(int32 InSlots) { UE_MVVM_SET_PROPERTY_VALUE(NumLoadSlots, InSlots); }
-	int32 GetNumLoadSlots() const { return NumLoadSlots; }
+
+	void SetPlayAndDeleteButtonsEnabled(const bool bEnabled) { UE_MVVM_SET_PROPERTY_VALUE(bEnablePlayAndDeleteButtons, bEnabled); }
+	bool GetPlayAndDeleteButtonsEnabled() const { return bEnablePlayAndDeleteButtons; }
 };

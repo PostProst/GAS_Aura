@@ -8,7 +8,6 @@
 #include "MVVM_LoadSlot.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSetWidgetSwitcherIndex, int32, WidgetSwitcherIndex);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnableSelectSlotButton, bool, bEnable);
 
 /**
  * 
@@ -22,10 +21,7 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FSetWidgetSwitcherIndex SetWidgetSwitcherIndexDelegate;
-
-	UPROPERTY(BlueprintAssignable)
-	FEnableSelectSlotButton EnableSelectSlotButtonDelegate;
-
+	
 	void InitializeSlot();
 
 	UPROPERTY()
@@ -43,6 +39,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess=true))
 	FString LoadSlotName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter = "SetSelectSlotButtonEnabled", Getter = "GetSelectSlotButtonEnabled", meta=(AllowPrivateAccess=true))
+	bool bEnableSelectSlotButton = true;
+
 public:
 	
 	void SetPlayerName(const FText& InPlayerName) { UE_MVVM_SET_PROPERTY_VALUE(PlayerName, InPlayerName); }
@@ -50,4 +49,7 @@ public:
 
 	void SetLoadSlotName(const FString& InLoadSlotName) { UE_MVVM_SET_PROPERTY_VALUE(LoadSlotName, InLoadSlotName); }
 	FString GetLoadSlotName() const { return LoadSlotName; }
+
+	void SetSelectSlotButtonEnabled(const bool bIsEnabled) { UE_MVVM_SET_PROPERTY_VALUE(bEnableSelectSlotButton, bIsEnabled); }
+	bool GetSelectSlotButtonEnabled() const { return bEnableSelectSlotButton; }
 };

@@ -19,8 +19,7 @@ void UMVVM_LoadScreen::InitializeLoadSlotViewModels()
 	LoadSlot_2 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
 	LoadSlot_2->SetLoadSlotName(FString("LoadSlot_2"));
 	LoadSlotsMap.Add(2, LoadSlot_2);
-
-	SetNumLoadSlots(LoadSlotsMap.Num());
+	
 }
 
 UMVVM_LoadSlot* UMVVM_LoadScreen::GetLoadSlotViewModelByIndex(int32 Index) const
@@ -48,13 +47,24 @@ void UMVVM_LoadScreen::SelectSlotButtonPressed(int32 Slot)
 	{
 		if (Pair.Key == Slot)
 		{
-			Pair.Value->EnableSelectSlotButtonDelegate.Broadcast(false);
+			Pair.Value->SetSelectSlotButtonEnabled(false);
 		}
 		else
 		{
-			Pair.Value->EnableSelectSlotButtonDelegate.Broadcast(true);
+			Pair.Value->SetSelectSlotButtonEnabled(true);
 		}
 	}
+	SetPlayAndDeleteButtonsEnabled(true);
+}
+
+void UMVVM_LoadScreen::BackButtonPressed()
+{
+	for (const auto& Pair : LoadSlotsMap)
+	{
+		Pair.Value->SetSelectSlotButtonEnabled(true);
+	}
+	SetPlayAndDeleteButtonsEnabled(false);
+	//TODO: Set selected LoadSlot to nullptr
 }
 
 void UMVVM_LoadScreen::LoadData()
