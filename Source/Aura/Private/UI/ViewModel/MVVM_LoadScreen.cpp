@@ -12,12 +12,15 @@ void UMVVM_LoadScreen::InitializeLoadSlotViewModels()
 	checkf(LoadSlotViewModelClass, TEXT("LoadSlotViewModelClass is not set in MVVM Load Screen blueprint"));
 	LoadSlot_0 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
 	LoadSlot_0->SetLoadSlotName(FString("LoadSlot_0"));
+	LoadSlot_0->LoadSlotIndex = 0;
 	LoadSlotsMap.Add(0, LoadSlot_0);
 	LoadSlot_1 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
 	LoadSlot_1->SetLoadSlotName(FString("LoadSlot_1"));
+	LoadSlot_1->LoadSlotIndex = 1;
 	LoadSlotsMap.Add(1, LoadSlot_1);
 	LoadSlot_2 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
 	LoadSlot_2->SetLoadSlotName(FString("LoadSlot_2"));
+	LoadSlot_2->LoadSlotIndex = 2;
 	LoadSlotsMap.Add(2, LoadSlot_2);
 	
 }
@@ -54,6 +57,7 @@ void UMVVM_LoadScreen::SelectSlotButtonPressed(int32 Slot)
 			Pair.Value->SetSelectSlotButtonEnabled(true);
 		}
 	}
+	SelectedLoadSlot = LoadSlotsMap[Slot];
 	SetPlayAndDeleteButtonsEnabled(true);
 }
 
@@ -64,7 +68,18 @@ void UMVVM_LoadScreen::BackButtonPressed()
 		Pair.Value->SetSelectSlotButtonEnabled(true);
 	}
 	SetPlayAndDeleteButtonsEnabled(false);
-	//TODO: Set selected LoadSlot to nullptr
+	SelectedLoadSlot = nullptr;
+}
+
+void UMVVM_LoadScreen::DeleteButtonPressed()
+{
+	if (IsValid(SelectedLoadSlot))
+	{
+		AAuraGameModeBase::DeleteSaveGameSlot(SelectedLoadSlot);
+		SelectedLoadSlot->SaveSlotStatus = Vacant;
+		SelectedLoadSlot->SetSelectSlotButtonEnabled(true);
+		SelectedLoadSlot->InitializeSlot();
+	}
 }
 
 void UMVVM_LoadScreen::LoadData()

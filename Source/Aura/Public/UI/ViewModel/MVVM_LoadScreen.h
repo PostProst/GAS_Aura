@@ -44,6 +44,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void BackButtonPressed();
 
+	UFUNCTION(BlueprintCallable)
+	void DeleteButtonPressed();
+
 	void LoadData();
 	
 private:
@@ -57,6 +60,9 @@ private:
 	TObjectPtr<UMVVM_LoadSlot> LoadSlot_1;
 	UPROPERTY()
 	TObjectPtr<UMVVM_LoadSlot> LoadSlot_2;
+
+	UPROPERTY()
+	UMVVM_LoadSlot* SelectedLoadSlot;
 
 
 	// Field notifies
