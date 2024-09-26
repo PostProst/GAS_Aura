@@ -42,6 +42,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter = "SetSelectSlotButtonEnabled", Getter = "GetSelectSlotButtonEnabled", meta=(AllowPrivateAccess=true))
 	bool bEnableSelectSlotButton = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess=true))
+	FString MapName;
+
 public:
 	
 	void SetPlayerName(const FText& InPlayerName) { UE_MVVM_SET_PROPERTY_VALUE(PlayerName, InPlayerName); }
@@ -52,4 +55,7 @@ public:
 
 	void SetSelectSlotButtonEnabled(const bool bIsEnabled) { UE_MVVM_SET_PROPERTY_VALUE(bEnableSelectSlotButton, bIsEnabled); }
 	bool GetSelectSlotButtonEnabled() const { return bEnableSelectSlotButton; }
+
+	void SetMapName(const FString& InMapName) { UE_MVVM_SET_PROPERTY_VALUE(MapName, InMapName); }
+	FString GetMapName() const { return MapName; }
 };
