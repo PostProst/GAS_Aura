@@ -38,6 +38,11 @@ ULoadScreenSaveGame* AAuraGameModeBase::GetSaveSlotData(const FString& SlotName,
 	return Cast<ULoadScreenSaveGame>(SaveGameObject);
 }
 
+void AAuraGameModeBase::TravelToMap(UMVVM_LoadSlot* Slot)
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(Slot, Maps.FindChecked(Slot->GetMapName()));
+}
+
 void AAuraGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
