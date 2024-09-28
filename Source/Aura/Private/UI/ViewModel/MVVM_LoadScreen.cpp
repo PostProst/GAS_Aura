@@ -3,6 +3,7 @@
 
 #include "UI/ViewModel/MVVM_LoadScreen.h"
 
+#include "Game/AuraGameInstance.h"
 #include "Game/AuraGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
@@ -38,7 +39,14 @@ void UMVVM_LoadScreen::NewSlotButtonPressed(int32 Slot)
 	
 	AuraGameMode->SaveSlotData(LoadSlotsMap[Slot], Slot);
 	LoadSlotsMap[Slot]->InitializeSlot();
+
+	// make slot selected after it has been created
 	SelectSlotButtonPressed(Slot);
+
+	UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(AuraGameMode->GetGameInstance());
+	AuraGameInstance->LoadSlotName = LoadSlotsMap[Slot]->GetLoadSlotName();
+	AuraGameInstance->LoadSlotIndex = LoadSlotsMap[Slot]->LoadSlotIndex;
+	AuraGameInstance->PlayerStartTag = AuraGameMode->DefaultPlayerStartTag;
 }
 
 void UMVVM_LoadScreen::NewGameButtonPressed(int32 Slot)

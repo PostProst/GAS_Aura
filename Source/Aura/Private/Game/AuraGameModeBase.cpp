@@ -3,7 +3,9 @@
 
 #include "Game/AuraGameModeBase.h"
 
+#include "Game/AuraGameInstance.h"
 #include "Game/LoadScreenSaveGame.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
 
@@ -41,6 +43,33 @@ ULoadScreenSaveGame* AAuraGameModeBase::GetSaveSlotData(const FString& SlotName,
 void AAuraGameModeBase::TravelToMap(UMVVM_LoadSlot* Slot)
 {
 	UGameplayStatics::OpenLevelBySoftObjectPtr(Slot, Maps.FindChecked(Slot->GetMapName()));
+}
+
+AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(GetGameInstance());
+	
+	TArray<AActor*> PlayerStarts;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStarts);
+	if (PlayerStarts.Num() > 0)
+	{
+		// set the PlayerStart to the first in the array just in case
+		AActor* SelectedPlayerStart = PlayerStarts[0];
+		for (AActor* Actor : PlayerStarts)
+		{
+			// loop over all player starts to find the one that's set on the GameInstance
+			if (APlayerStart* PlayerStart = Cast<APlayerStart>(Actor))
+			{
+				if (PlayerStart->PlayerStartTag == AuraGameInstance->PlayerStartTag)
+				{
+					SelectedPlayerStart = PlayerStart;
+					break;
+				}
+			}
+		}
+		return SelectedPlayerStart;
+	}
+	return nullptr;
 }
 
 void AAuraGameModeBase::BeginPlay()
