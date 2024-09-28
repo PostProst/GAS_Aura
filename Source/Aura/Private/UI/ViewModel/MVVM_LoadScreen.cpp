@@ -38,6 +38,7 @@ void UMVVM_LoadScreen::NewSlotButtonPressed(int32 Slot)
 	
 	AuraGameMode->SaveSlotData(LoadSlotsMap[Slot], Slot);
 	LoadSlotsMap[Slot]->InitializeSlot();
+	SelectSlotButtonPressed(Slot);
 }
 
 void UMVVM_LoadScreen::NewGameButtonPressed(int32 Slot)
