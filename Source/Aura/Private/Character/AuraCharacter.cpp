@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "Game/AuraGameInstance.h"
 #include "Game/AuraGameModeBase.h"
@@ -116,8 +117,22 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 	{
 		ULoadScreenSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
 		if (SaveData == nullptr) return;
-
+		
 		SaveData->PlayerStartTag = CheckpointTag;
+
+		AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState());
+		check(AuraPlayerState);
+		SaveData->PlayerLevel = AuraPlayerState->GetPlayerLevel();
+		SaveData->XP = AuraPlayerState->GetXP();
+		SaveData->SpellPoints = AuraPlayerState->GetSpellPoints();
+		SaveData->AttributePoints = AuraPlayerState->GetAttributePoints();
+		
+		UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(GetAttributeSet());
+		check(AuraAttributeSet);
+		SaveData->Strength = AuraAttributeSet->GetStrength();
+		SaveData->Intelligence = AuraAttributeSet->GetIntelligence();
+		SaveData->Resilience = AuraAttributeSet->GetResilience();
+		SaveData->Vigor = AuraAttributeSet->GetVigor();
 		
 		AuraGameMode->SaveInGameProgressData(SaveData);
 	}

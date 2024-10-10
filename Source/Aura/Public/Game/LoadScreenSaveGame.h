@@ -44,6 +44,35 @@ public:
 	UPROPERTY()
 	FName PlayerStartTag = FName();
 
+	/* Player Data */
+
+	UPROPERTY()
+	int32 PlayerLevel = 0;
+
+	UPROPERTY()
+	int32 XP = 0;
+
+	UPROPERTY()
+	int32 SpellPoints = 0;
+	
+	UPROPERTY()
+	int32 AttributePoints = 0;
+
+	/* Player Data */
+	
+	UPROPERTY()
+	float Strength = 0.f;
+
+	UPROPERTY()
+	float Intelligence = 0.f;
+
+	UPROPERTY()
+	float Resilience = 0.f;
+
+	UPROPERTY()
+	float Vigor = 0.f;
+	
+
 protected:
 
 
