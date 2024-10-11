@@ -119,6 +119,7 @@ void UMVVM_LoadScreen::LoadData()
 		Pair.Value->SetPlayerName(FText::FromString(SaveGameObject->PlayerName));
 		Pair.Value->SetMapName(SaveGameObject->MapName);
 		Pair.Value->PlayerStartTag = SaveGameObject->PlayerStartTag;
+		Pair.Value->SetPlayerLevel(SaveGameObject->PlayerLevel);
 		Pair.Value->InitializeSlot();
 	}
 }

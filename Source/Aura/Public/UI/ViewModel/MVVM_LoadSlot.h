@@ -40,6 +40,9 @@ private:
 	FText PlayerName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess=true))
+	int32 PlayerLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess=true))
 	FString LoadSlotName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter = "SetSelectSlotButtonEnabled", Getter = "GetSelectSlotButtonEnabled", meta=(AllowPrivateAccess=true))
@@ -52,6 +55,9 @@ public:
 	
 	void SetPlayerName(const FText& InPlayerName) { UE_MVVM_SET_PROPERTY_VALUE(PlayerName, InPlayerName); }
 	FText GetPlayerName() const { return PlayerName; }
+
+	void SetPlayerLevel(int32 InPlayerLevel) { UE_MVVM_SET_PROPERTY_VALUE(PlayerLevel, InPlayerLevel); }
+	int32 GetPlayerLevel() const { return PlayerLevel; }
 
 	void SetLoadSlotName(const FString& InLoadSlotName) { UE_MVVM_SET_PROPERTY_VALUE(LoadSlotName, InLoadSlotName); }
 	FString GetLoadSlotName() const { return LoadSlotName; }

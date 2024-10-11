@@ -50,7 +50,7 @@ public:
 	/* Player Data */
 
 	UPROPERTY()
-	int32 PlayerLevel = 0;
+	int32 PlayerLevel = 1;
 
 	UPROPERTY()
 	int32 XP = 0;
@@ -61,7 +61,7 @@ public:
 	UPROPERTY()
 	int32 AttributePoints = 0;
 
-	/* Player Data */
+	/* Attributes */
 	
 	UPROPERTY()
 	float Strength = 0.f;
