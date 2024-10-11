@@ -22,9 +22,9 @@ void UOverlayWidgetController::BroadcastInitialValues()
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	GetAuraPS()->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
-	GetAuraPS()->OnLevelChangedDelegate.AddLambda([this](int32 NewValue)
+	GetAuraPS()->OnLevelChangedDelegate.AddLambda([this](int32 NewValue, bool bLevelUp)
 	{
-		OnPlayerLevelChanged.Broadcast(NewValue);
+		OnPlayerLevelChanged.Broadcast(NewValue, bLevelUp);
 	});
 	
 	/* Binding callbacks to the ASC's value changed delegates which broadcast our delegates to widgets */

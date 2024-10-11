@@ -43,13 +43,14 @@ public:
 	void MulticastLevelUpParticles() const;
 
 	UFUNCTION()
-	void OnLevelUp(int32 NewLevel);
+	void OnLevelUp(int32 NewLevel, bool bLevelUp);
 	
 protected:
 	virtual void InitAbilityActorInfo() override;
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	virtual void OnRep_Stunned() override;
 	virtual void OnRep_Burned() override;
+	void LoadProgress();
 	
 private:
 	UPROPERTY(VisibleAnywhere)

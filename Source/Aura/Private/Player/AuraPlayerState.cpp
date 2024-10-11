@@ -36,19 +36,19 @@ UAbilitySystemComponent* AAuraPlayerState::GetAbilitySystemComponent() const
 
 void AAuraPlayerState::OnRep_Level(int32 OldLevel)
 {
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, true);
 }
 
 void AAuraPlayerState::SetLevel(int32 NewLevel)
 {
 	Level = NewLevel;
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, false);
 }
 
 void AAuraPlayerState::AddToLevel(int32 InLevel)
 {
 	Level += InLevel;
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, true);
 }
 
 void AAuraPlayerState::OnRep_XP(int32 OldXP)
@@ -96,7 +96,7 @@ void AAuraPlayerState::AddToXP(int32 InXP)
 		AuraAS->SetTopOffHealth(true);
 		AuraAS->SetTopOffMana(true);
 		
-		OnLevelChangedDelegate.Broadcast(Level);
+		OnLevelChangedDelegate.Broadcast(Level, true);
 	}
 	OnXPChangedDelegate.Broadcast(XP);
 }

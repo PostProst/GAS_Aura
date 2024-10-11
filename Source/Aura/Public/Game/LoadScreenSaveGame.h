@@ -30,6 +30,9 @@ public:
 	UPROPERTY()
 	int32 SlotIndex = 0;
 
+	UPROPERTY()
+	bool bFirstTimeLoading = true;
+
 	/* Variables we want to save in a SaveGame object */
 	
 	UPROPERTY()

@@ -9,6 +9,7 @@
 #include "AuraAbilitySystemLibrary.generated.h"
 
 
+class ULoadScreenSaveGame;
 struct FDamageEffectParams;
 struct FGameplayEffectContextHandle;
 class UAbilitySystemComponent;
@@ -50,6 +51,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | CharacterClassDefaults", meta = (DefaultToSelf = "WorldContext"))
 	static void InitializeDefaultAttributes(const UObject* WorldContext, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
+
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | CharacterClassDefaults", meta = (DefaultToSelf = "WorldContext"))
+	static void InitializeAttributesFromSaveData(const UObject* WorldContext, UAbilitySystemComponent* ASC, ULoadScreenSaveGame* SaveGame);
 
 	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary | CharacterClassDefaults", meta = (DefaultToSelf = "WorldContext"))
 	static void GiveStartupAbilities(const UObject* WorldContext, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass);

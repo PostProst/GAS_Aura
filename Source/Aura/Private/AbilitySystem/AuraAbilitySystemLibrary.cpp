@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "AuraAbilitySystemTypes.h"
 #include "Game/AuraGameModeBase.h"
+#include "Game/LoadScreenSaveGame.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerState.h"
@@ -98,20 +99,51 @@ void UAuraAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* World
 	
 }
 
+void UAuraAbilitySystemLibrary::InitializeAttributesFromSaveData(const UObject* WorldContext,
+	UAbilitySystemComponent* ASC, ULoadScreenSaveGame* SaveGame)
+{
+	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContext);
+	if (CharacterClassInfo == nullptr) return;
+
+	const AActor* SourceAvatarActor = ASC->GetAvatarActor();
+	
+	FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+	ContextHandle.AddSourceObject(SourceAvatarActor);
+	
+	const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->PrimaryAttributesSetByCaller, 1.f, ContextHandle);
+	
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, FGameplayTag::RequestGameplayTag(FName("Attributes.Primary.Strength")), SaveGame->Strength);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, FGameplayTag::RequestGameplayTag(FName("Attributes.Primary.Intelligence")), SaveGame->Intelligence);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, FGameplayTag::RequestGameplayTag(FName("Attributes.Primary.Resilience")), SaveGame->Resilience);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, FGameplayTag::RequestGameplayTag(FName("Attributes.Primary.Vigor")), SaveGame->Vigor);
+
+	ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+
+	FGameplayEffectContextHandle SecondaryEffectContextHandle = ASC->MakeEffectContext();
+	SecondaryEffectContextHandle.AddSourceObject(SourceAvatarActor);
+	const FGameplayEffectSpecHandle SecondaryAttributesSpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->SecondaryAttributes, 1.f, SecondaryEffectContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributesSpecHandle.Data.Get());
+
+	FGameplayEffectContextHandle VitalEffectContextHandle = ASC->MakeEffectContext();
+	VitalEffectContextHandle.AddSourceObject(SourceAvatarActor);
+	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->VitalAttributes, 1.f, VitalEffectContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
+}
+
 void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContext, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
 {
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContext);
 	if (ASC == nullptr || CharacterClassInfo == nullptr) return;
 
 	// give common abilities to the character
-	for (auto const Ability : CharacterClassInfo->CommonAbilities)
+	for (const auto& Ability : CharacterClassInfo->CommonAbilities)
 	{
 		const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability);
 		ASC->GiveAbility(AbilitySpec);
 	}
 	// give abilities specific to the given character class
 	const FCharacterClassDefaultInfo& DefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
-	for (auto const Ability : DefaultInfo.StartupAbilities)
+	for (const auto& Ability : DefaultInfo.StartupAbilities)
 	{
 		// Implements<>() function needs to take in U version of the interface class instead of I
 		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())

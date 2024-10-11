@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "Game/AuraGameInstance.h"
@@ -51,7 +52,33 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 
 	// InitAbilityActorInfo for the server
 	InitAbilityActorInfo();
-	AddCharacterAbilities();
+	LoadProgress();
+}
+
+void AAuraCharacter::LoadProgress()
+{
+	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		ULoadScreenSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
+		if (SaveData == nullptr) return;
+		
+		if (SaveData->bFirstTimeLoading)
+		{
+			InitializeDefaultAttributes();
+			AddCharacterAbilities();
+		}
+		else
+		{
+			AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState());
+			check(AuraPlayerState);
+			AuraPlayerState->SetLevel(SaveData->PlayerLevel);
+			AuraPlayerState->SetXP(SaveData->XP);
+			AuraPlayerState->SetAttributePoints(SaveData->AttributePoints);
+			AuraPlayerState->SetSpellPoints(SaveData->SpellPoints);
+			UAuraAbilitySystemLibrary::InitializeAttributesFromSaveData(this, GetAbilitySystemComponent(), SaveData);
+			// TODO load abilities from disk
+		}
+	}
 }
 
 void AAuraCharacter::OnRep_PlayerState()
@@ -133,6 +160,8 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		SaveData->Intelligence = AuraAttributeSet->GetIntelligence();
 		SaveData->Resilience = AuraAttributeSet->GetResilience();
 		SaveData->Vigor = AuraAttributeSet->GetVigor();
+
+		SaveData->bFirstTimeLoading = false;
 		
 		AuraGameMode->SaveInGameProgressData(SaveData);
 	}
@@ -148,9 +177,12 @@ void AAuraCharacter::MulticastLevelUpParticles_Implementation() const
 	LevelUpNiagaraComponent->Activate(true);
 }
 
-void AAuraCharacter::OnLevelUp(int32 NewLevel)
+void AAuraCharacter::OnLevelUp(int32 NewLevel, bool bLevelUp)
 {
-	MulticastLevelUpParticles();
+	if (bLevelUp)
+	{
+		MulticastLevelUpParticles();	
+	}
 }
 
 // As dynamic gameplay effects are not replicated when we create debuff GE in AttributeSet
@@ -208,7 +240,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 		}
 	}
 	/* Initialize Primary and Secondary Attributes with a Gameplay Effect */
-	InitializeDefaultAttributes();
+	//InitializeDefaultAttributes();
 }
 
 void AAuraCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
