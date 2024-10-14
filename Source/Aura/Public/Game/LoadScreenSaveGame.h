@@ -41,6 +41,12 @@ struct FSavedAbility
 	int32 AbilityLevel;
 };
 
+// overloading == operator for FSavedAbility type, so we can compare two instances in such functions as AddUnique
+inline bool operator==(const FSavedAbility& Left, const FSavedAbility& Right)
+{
+	return Left.AbilityTag.MatchesTagExact(Right.AbilityTag);
+}
+
 /**
  * 
  */

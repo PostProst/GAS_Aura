@@ -9,8 +9,6 @@
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Camera/CameraComponent.h"
-#include "Commandlets/WorldPartitionCommandletHelpers.h"
-#include "Game/AuraGameInstance.h"
 #include "Game/AuraGameModeBase.h"
 #include "Game/LoadScreenSaveGame.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -77,7 +75,10 @@ void AAuraCharacter::LoadProgress()
 			AuraPlayerState->SetAttributePoints(SaveData->AttributePoints);
 			AuraPlayerState->SetSpellPoints(SaveData->SpellPoints);
 			UAuraAbilitySystemLibrary::InitializeAttributesFromSaveData(this, GetAbilitySystemComponent(), SaveData);
-			// TODO load abilities from disk
+			
+			UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+			check(AuraASC);
+			AuraASC->AddCharacterAbilitiesFromSaveData(SaveData);
 		}
 	}
 }
@@ -88,6 +89,58 @@ void AAuraCharacter::OnRep_PlayerState()
 
 	// InitAbilityActorInfo for the client
 	InitAbilityActorInfo();
+}
+
+void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
+{
+	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		ULoadScreenSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
+		if (SaveData == nullptr) return;
+		
+		SaveData->PlayerStartTag = CheckpointTag;
+
+		AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState());
+		check(AuraPlayerState);
+		SaveData->PlayerLevel = AuraPlayerState->GetPlayerLevel();
+		SaveData->XP = AuraPlayerState->GetXP();
+		SaveData->SpellPoints = AuraPlayerState->GetSpellPoints();
+		SaveData->AttributePoints = AuraPlayerState->GetAttributePoints();
+		
+		UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(GetAttributeSet());
+		check(AuraAttributeSet);
+		SaveData->Strength = AuraAttributeSet->GetStrength();
+		SaveData->Intelligence = AuraAttributeSet->GetIntelligence();
+		SaveData->Resilience = AuraAttributeSet->GetResilience();
+		SaveData->Vigor = AuraAttributeSet->GetVigor();
+
+		SaveData->bFirstTimeLoading = false;
+
+		// -------Saving Abilities-------
+		// 1. Create FForEachAbility delegate
+		// 2. Bind Lambda to it. There we create FSavedAbility struct and save all Ability data to it
+		// 3. Add FSavedAbility struct to the array of abilities on the SaveGame object
+		// 4. Empty Abilities array
+		// 5. Call FForEachAbility on ASC to execute this labmda on every activatable ability
+		FForEachAbility SaveAbilityDelegate;
+		SaveAbilityDelegate.BindLambda([this, SaveData](const FGameplayAbilitySpec& Spec)
+		{
+			FSavedAbility SavedAbility;
+			SavedAbility.Ability = Spec.Ability.GetClass();
+			SavedAbility.AbilityLevel = Spec.Level;
+			SavedAbility.AbilityStatus = UAuraAbilitySystemComponent::GetAbilityStatusFromSpec(Spec);
+			SavedAbility.AbilityTag = UAuraAbilitySystemComponent::GetAbilityTagFromSpec(Spec);
+			SavedAbility.AbilityInputSlot = UAuraAbilitySystemComponent::GetInputTagFromSpec(Spec);
+			SavedAbility.AbilityType = UAuraAbilitySystemComponent::GetAbilityTypeFromSpec(Spec);
+
+			SaveData->Abilities.AddUnique(SavedAbility);
+		});
+		SaveData->Abilities.Empty();
+		UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+		AuraASC->ForEachAbility(SaveAbilityDelegate);
+		
+		AuraGameMode->SaveInGameProgressData(SaveData);
+	}
 }
 
 int32 AAuraCharacter::GetPlayerLevel_Implementation()
@@ -136,56 +189,6 @@ void AAuraCharacter::HideMagicCircle_Implementation()
 	{
 		AuraPC->HideMagicCircle();
 		AuraPC->bShowMouseCursor = true;
-	}
-}
-
-void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
-{
-	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
-	{
-		ULoadScreenSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
-		if (SaveData == nullptr) return;
-		
-		SaveData->PlayerStartTag = CheckpointTag;
-
-		AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState());
-		check(AuraPlayerState);
-		SaveData->PlayerLevel = AuraPlayerState->GetPlayerLevel();
-		SaveData->XP = AuraPlayerState->GetXP();
-		SaveData->SpellPoints = AuraPlayerState->GetSpellPoints();
-		SaveData->AttributePoints = AuraPlayerState->GetAttributePoints();
-		
-		UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(GetAttributeSet());
-		check(AuraAttributeSet);
-		SaveData->Strength = AuraAttributeSet->GetStrength();
-		SaveData->Intelligence = AuraAttributeSet->GetIntelligence();
-		SaveData->Resilience = AuraAttributeSet->GetResilience();
-		SaveData->Vigor = AuraAttributeSet->GetVigor();
-
-		SaveData->bFirstTimeLoading = false;
-
-		// -------Saving Abilities-------
-		// 1. Create FForEachAbility delegate
-		// 2. Bind Lambda to it. There we create FSavedAbility struct and save all Ability data to it
-		// 3. Add FSavedAbility struct to the array of abilities on the SaveGame object
-		// 4. Call FForEachAbility on ASC to execute this labmda on every activatable ability
-		FForEachAbility SaveAbilityDelegate;
-		SaveAbilityDelegate.BindLambda([this, SaveData](const FGameplayAbilitySpec& Spec)
-		{
-			FSavedAbility SavedAbility;
-			SavedAbility.Ability = Spec.Ability.GetClass();
-			SavedAbility.AbilityLevel = Spec.Level;
-			SavedAbility.AbilityStatus = UAuraAbilitySystemComponent::GetAbilityStatusFromSpec(Spec);
-			SavedAbility.AbilityTag = UAuraAbilitySystemComponent::GetAbilityTagFromSpec(Spec);
-			SavedAbility.AbilityInputSlot = UAuraAbilitySystemComponent::GetInputTagFromSpec(Spec);
-			SavedAbility.AbilityType = UAuraAbilitySystemComponent::GetAbilityTypeFromSpec(Spec);
-
-			SaveData->Abilities.Add(SavedAbility);
-		});
-		UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
-		AuraASC->ForEachAbility(SaveAbilityDelegate);
-		
-		AuraGameMode->SaveInGameProgressData(SaveData);
 	}
 }
 

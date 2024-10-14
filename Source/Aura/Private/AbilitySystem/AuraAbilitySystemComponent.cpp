@@ -8,6 +8,7 @@
 #include "AbilitySystem/Abilities/AuraGameplayAbility.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "Aura/AuraLogChannels.h"
+#include "Game/LoadScreenSaveGame.h"
 #include "Interaction/PlayerInterface.h"
 
 void UAuraAbilitySystemComponent::AbilityActorInfoSet()
@@ -44,8 +45,37 @@ void UAuraAbilitySystemComponent::AddCharacterPassiveAbilities(
 	for (const auto& AbilityClass : StartupPassiveAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		AbilitySpec.DynamicAbilityTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Equipped")));
 		GiveAbilityAndActivateOnce(AbilitySpec);
 	}
+}
+
+void UAuraAbilitySystemComponent::AddCharacterAbilitiesFromSaveData(const ULoadScreenSaveGame* SaveGame)
+{
+	if (!IsOwnerActorAuthoritative()) return;
+
+	for (const auto& SavedAbility : SaveGame->Abilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(SavedAbility.Ability, SavedAbility.AbilityLevel);
+
+		AbilitySpec.DynamicAbilityTags.AddTag(SavedAbility.AbilityTag);
+		AbilitySpec.DynamicAbilityTags.AddTag(SavedAbility.AbilityInputSlot);
+		AbilitySpec.DynamicAbilityTags.AddTag(SavedAbility.AbilityStatus);
+		AbilitySpec.DynamicAbilityTags.AddTag(SavedAbility.AbilityType);
+		
+		if (SavedAbility.AbilityType.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("Abilities.Type.Passive"))) &&
+			SavedAbility.AbilityStatus.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Equipped"))))
+		{
+			GiveAbilityAndActivateOnce(AbilitySpec);
+			MulticastActivatePassiveEffect(SavedAbility.AbilityTag, true);
+		}
+		else
+		{
+			GiveAbility(AbilitySpec);
+		}
+	}
+	bStartupAbilitiesGiven = true;
+	AbilitiesGivenDelegate.Broadcast();
 }
 
 void UAuraAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
@@ -126,7 +156,9 @@ FGameplayTag UAuraAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayA
 	{
 		for (FGameplayTag Tag : AbilitySpec.Ability->AbilityTags)
 		{
-			if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities"))))
+			if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities"))) &&
+				!Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Type"))) &&
+				!Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Status"))))
 			{
 				return Tag;
 			}
@@ -149,7 +181,7 @@ FGameplayTag UAuraAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbi
 
 FGameplayTag UAuraAbilitySystemComponent::GetAbilityTypeFromSpec(const FGameplayAbilitySpec& AbilitySpec)
 {
-	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	for (FGameplayTag Tag : AbilitySpec.Ability->AbilityTags)
 	{
 		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Type"))))
 		{
@@ -296,11 +328,11 @@ void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 	// first make sure the ability exists on the ASC
 	if (FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromAbilityTag(AbilityTag))
 	{
-		const FGameplayTag& PreviousInputTag = GetInputTagFromSpec(*AbilitySpec);
-		const FGameplayTag& Status = GetAbilityStatusFromSpec(*AbilitySpec);
+		const FGameplayTag PreviousInputTag = GetInputTagFromSpec(*AbilitySpec);
+		const FGameplayTag Status = GetAbilityStatusFromSpec(*AbilitySpec);
 
-		const FGameplayTag& EquippedTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Equipped"));
-		const FGameplayTag& UnlockedTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Unlocked"));
+		const FGameplayTag EquippedTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Equipped"));
+		const FGameplayTag UnlockedTag = FGameplayTag::RequestGameplayTag(FName("Abilities.Status.Unlocked"));
 
 		if (PreviousInputTag == InputTag) return;
 		if (Status == EquippedTag || Status == UnlockedTag)
@@ -310,7 +342,7 @@ void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 			{
 				if (FGameplayAbilitySpec* SpecWithInputTag = GetAbilitySpecFromInputTag(InputTag))
 				{
-					const FGameplayTag& OccupiedAbilityTag = GetAbilityTagFromSpec(*SpecWithInputTag);
+					const FGameplayTag OccupiedAbilityTag = GetAbilityTagFromSpec(*SpecWithInputTag);
 					
 					// return early if occupied ability and the one we want to equip are the same
 					if (AbilityTag.MatchesTagExact(OccupiedAbilityTag))
@@ -335,6 +367,8 @@ void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 				if (IsPassiveAbility(*AbilitySpec))
 				{
 					TryActivateAbility(AbilitySpec->Handle);
+					AbilitySpec->DynamicAbilityTags.RemoveTag(GetAbilityStatusFromSpec(*AbilitySpec));
+					AbilitySpec->DynamicAbilityTags.AddTag(EquippedTag);
 					MulticastActivatePassiveEffect(AbilityTag, true);
 				}
 			}
