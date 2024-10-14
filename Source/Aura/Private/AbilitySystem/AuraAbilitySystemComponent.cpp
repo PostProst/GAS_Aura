@@ -108,7 +108,8 @@ void UAuraAbilitySystemComponent::ForEachAbility(const FForEachAbility& Delegate
 	// FScopedAbilityListLock is used to lock the scope of the function 
 	// preventing abilities from being added or removed from the given ASC when iterating over them
 	FScopedAbilityListLock ActiveScopeLock(*this);
-	
+
+	// loop over all ActivatableAbilities on the ASC and execute given delegate if it is bound to an AbilitySpec
 	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		if (!Delegate.ExecuteIfBound(AbilitySpec))
@@ -139,6 +140,18 @@ FGameplayTag UAuraAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbi
 	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
 	{
 		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("InputTag"))))
+		{
+			return Tag;
+		}
+	}
+	return FGameplayTag();
+}
+
+FGameplayTag UAuraAbilitySystemComponent::GetAbilityTypeFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (FGameplayTag Tag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Type"))))
 		{
 			return Tag;
 		}

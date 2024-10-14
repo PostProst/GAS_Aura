@@ -44,6 +44,7 @@ public:
 
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	static FGameplayTag GetAbilityTypeFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	FGameplayTag GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag);
 	static FGameplayTag GetAbilityStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	FGameplayTag GetAbilityStatusFromTag(const FGameplayTag& AbilityTag);
