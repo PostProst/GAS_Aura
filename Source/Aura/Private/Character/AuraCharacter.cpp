@@ -9,6 +9,7 @@
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "Camera/CameraComponent.h"
+#include "Commandlets/WorldPartitionCommandletHelpers.h"
 #include "Game/AuraGameInstance.h"
 #include "Game/AuraGameModeBase.h"
 #include "Game/LoadScreenSaveGame.h"
@@ -162,6 +163,27 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		SaveData->Vigor = AuraAttributeSet->GetVigor();
 
 		SaveData->bFirstTimeLoading = false;
+
+		// -------Saving Abilities-------
+		// 1. Create FForEachAbility delegate
+		// 2. Bind Lambda to it. There we create FSavedAbility struct and save all Ability data to it
+		// 3. Add FSavedAbility struct to the array of abilities on the SaveGame object
+		// 4. Call FForEachAbility on ASC to execute this labmda on every activatable ability
+		FForEachAbility SaveAbilityDelegate;
+		SaveAbilityDelegate.BindLambda([this, SaveData](const FGameplayAbilitySpec& Spec)
+		{
+			FSavedAbility SavedAbility;
+			SavedAbility.Ability = Spec.Ability.GetClass();
+			SavedAbility.AbilityLevel = Spec.Level;
+			SavedAbility.AbilityStatus = UAuraAbilitySystemComponent::GetAbilityStatusFromSpec(Spec);
+			SavedAbility.AbilityTag = UAuraAbilitySystemComponent::GetAbilityTagFromSpec(Spec);
+			SavedAbility.AbilityInputSlot = UAuraAbilitySystemComponent::GetInputTagFromSpec(Spec);
+			SavedAbility.AbilityType = UAuraAbilitySystemComponent::GetAbilityTypeFromSpec(Spec);
+
+			SaveData->Abilities.Add(SavedAbility);
+		});
+		UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+		AuraASC->ForEachAbility(SaveAbilityDelegate);
 		
 		AuraGameMode->SaveInGameProgressData(SaveData);
 	}

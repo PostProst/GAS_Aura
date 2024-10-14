@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/SaveGame.h"
 #include "LoadScreenSaveGame.generated.h"
+
+class UGameplayAbility;
 
 UENUM(BlueprintType)
 enum ESaveSlotStatus
@@ -12,6 +15,30 @@ enum ESaveSlotStatus
 	Vacant,
 	EnterName,
 	Taken
+};
+
+USTRUCT(BlueprintType)
+struct FSavedAbility
+{
+	GENERATED_BODY();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayAbility> Ability;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag AbilityTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag AbilityStatus;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag AbilityInputSlot;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag AbilityType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 AbilityLevel;
 };
 
 /**
@@ -74,7 +101,11 @@ public:
 
 	UPROPERTY()
 	float Vigor = 0.f;
+
+	/* Abilities */
 	
+	UPROPERTY()
+	TArray<FSavedAbility> Abilities;
 
 protected:
 
