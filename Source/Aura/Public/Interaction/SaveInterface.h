@@ -19,7 +19,12 @@ class USaveInterface : public UInterface
 class AURA_API ISaveInterface
 {
 	GENERATED_BODY()
-
 	
 public:
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool ShouldLoadTransform() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void LoadActor();
 };

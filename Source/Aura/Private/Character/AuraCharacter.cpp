@@ -79,6 +79,8 @@ void AAuraCharacter::LoadProgress()
 			UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
 			check(AuraASC);
 			AuraASC->AddCharacterAbilitiesFromSaveData(SaveData);
+
+			AuraGameMode->LoadWorldState(GetWorld());
 		}
 	}
 }

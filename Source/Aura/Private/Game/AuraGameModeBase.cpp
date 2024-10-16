@@ -4,7 +4,6 @@
 #include "Game/AuraGameModeBase.h"
 
 #include "EngineUtils.h"
-#include "Commandlets/WorldPartitionCommandletHelpers.h"
 #include "Game/AuraGameInstance.h"
 #include "Game/LoadScreenSaveGame.h"
 #include "GameFramework/PlayerStart.h"
@@ -98,7 +97,7 @@ AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	return nullptr;
 }
 
-void AAuraGameModeBase::SaveWorldState(UWorld* InWorld)
+void AAuraGameModeBase::SaveWorldState(UWorld* InWorld) const
 {
 	FString WorldName = InWorld->GetMapName();
 	// removes streaming prefix from the WorldName so we can get the actual asset name
@@ -137,11 +136,11 @@ void AAuraGameModeBase::SaveWorldState(UWorld* InWorld)
 			SavedActor.Transform = Actor->GetTransform();
 
 			// serializing SaveGame variables
-			FMemoryWriter MemoryWriter(SavedActor.Bytes);
+			FMemoryWriter MemoryWriter(SavedActor.Bytes); // Writer is for saving
 			
 			FObjectAndNameAsStringProxyArchive Archive(MemoryWriter, true);
 			Archive.ArIsSaveGame = true;
-
+			//Archive.SetIsSaving(true);
 			Actor->Serialize(Archive);
 
 			SavedMap.Actors.AddUnique(SavedActor);
@@ -158,6 +157,49 @@ void AAuraGameModeBase::SaveWorldState(UWorld* InWorld)
 		}
 		
 		UGameplayStatics::SaveGameToSlot(SaveGame, AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex);
+	}
+}
+
+void AAuraGameModeBase::LoadWorldState(UWorld* InWorld) const
+{
+	FString WorldName = InWorld->GetMapName();
+	WorldName.RemoveFromStart(InWorld->StreamingLevelsPrefix);
+
+	UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(GetGameInstance());
+	check(AuraGameInstance);
+	
+	if (UGameplayStatics::DoesSaveGameExist(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex))
+	{
+		ULoadScreenSaveGame* SaveGame = Cast<ULoadScreenSaveGame>(UGameplayStatics::LoadGameFromSlot(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex));
+		checkf(SaveGame, TEXT("Failed to load slot"));
+		
+		for (FActorIterator It(InWorld); It; ++It)
+		{
+			AActor* Actor = *It;
+			
+			if (!Actor->Implements<USaveInterface>()) continue;
+
+			for (const FSavedActor& SavedActor : SaveGame->GetSavedMapWIthMapName(WorldName).Actors)
+			{
+				if (SavedActor.ActorName == Actor->GetFName())
+				{
+					// Update Actor's transform
+					if (ISaveInterface::Execute_ShouldLoadTransform(Actor))
+					{
+						Actor->SetActorTransform(SavedActor.Transform);
+					}
+					
+					// Deserialize all Actor's SaveGame variables
+					FMemoryReader MemoryReader(SavedActor.Bytes); // Reader is for loading
+					FObjectAndNameAsStringProxyArchive Archive(MemoryReader, true);
+					Archive.ArIsSaveGame = true;
+					//Archive.SetIsLoading(true);
+					Actor->Serialize(Archive); // converts binary bytes back into variables
+
+					ISaveInterface::Execute_LoadActor(Actor);
+				}
+			}
+		}
 	}
 }
 

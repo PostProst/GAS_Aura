@@ -6,6 +6,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
+#include "Interaction/SaveInterface.h"
 #include "AuraCharacterBase.generated.h"
 
 class UDebuffNiagaraComponent;
@@ -21,7 +22,8 @@ class UPassiveNiagaraComponent;
 // 'Abstract' keyword means that the class is intended to be a base class for other classes
 // and is not meant to be instantiated on its own.
 UCLASS(Abstract)
-class AURA_API AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
+class AURA_API AAuraCharacterBase : public ACharacter, public IAbilitySystemInterface,
+public ICombatInterface, public ISaveInterface
 {
 	GENERATED_BODY()
 
@@ -48,6 +50,10 @@ public:
 	virtual bool IsInShock_Implementation() const override { return bIsInShock; }
 	virtual void SetInShock_Implementation(bool bInShock) override { bIsInShock = bInShock; }
 	/* end Combat Interface */
+
+	/* Save Interface */
+	virtual bool ShouldLoadTransform_Implementation() const override { return true; }
+	/* end Save Interface */
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
@@ -76,10 +82,13 @@ public:
 
 	UFUNCTION()
 	virtual void OnRep_Burned();
+	
+	UPROPERTY(SaveGame)
+	bool bDead = false;
 
 protected:
 	virtual void BeginPlay() override;
-	bool bDead = false;
+	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Combat)
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;

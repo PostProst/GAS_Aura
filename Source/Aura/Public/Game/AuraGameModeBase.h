@@ -52,7 +52,8 @@ public:
 
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
-	void SaveWorldState(UWorld* InWorld);
+	void SaveWorldState(UWorld* InWorld) const;
+	void LoadWorldState(UWorld* InWorld) const;
 
 protected:
 	virtual void BeginPlay() override;
