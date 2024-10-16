@@ -3,10 +3,14 @@
 
 #include "Game/AuraGameModeBase.h"
 
+#include "EngineUtils.h"
+#include "Commandlets/WorldPartitionCommandletHelpers.h"
 #include "Game/AuraGameInstance.h"
 #include "Game/LoadScreenSaveGame.h"
 #include "GameFramework/PlayerStart.h"
+#include "Interaction/SaveInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
 
 
@@ -92,6 +96,69 @@ AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 		return SelectedPlayerStart;
 	}
 	return nullptr;
+}
+
+void AAuraGameModeBase::SaveWorldState(UWorld* InWorld)
+{
+	FString WorldName = InWorld->GetMapName();
+	// removes streaming prefix from the WorldName so we can get the actual asset name
+	WorldName.RemoveFromStart(InWorld->StreamingLevelsPrefix);
+
+	UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(GetGameInstance());
+	check(AuraGameInstance);
+	if (ULoadScreenSaveGame* SaveGame = GetSaveSlotData(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex))
+	{
+		// first time saving this map? - add a new one to the SavedMaps array
+		if (!SaveGame->HasMap(WorldName))
+		{
+			FSavedMap NewSavedMap;
+			NewSavedMap.MapAssetName = WorldName;
+			SaveGame->SavedMaps.AddUnique(NewSavedMap);
+		}
+		// Create FSavedMap where we will override all FSavedActors.
+		// We will replace the actual Map on the SaveGame object with it later
+		FSavedMap SavedMap = SaveGame->GetSavedMapWIthMapName(WorldName);
+		SavedMap.Actors.Empty(); // clear the array, we will replace all actors
+
+		/* ------ Saving Actors' State ------
+		* 1. iterate over all actors in the World
+		* 2. find those who implement SaveGame interface
+		* 3. save the actor itself FSavedActor->FSavedMap->ULoadScreenSaveGame
+		* 4. serialize the Actor's UPROPERTY(SaveGame) variables
+		*/
+		for (FActorIterator It(InWorld); It; ++It)
+		{
+			AActor* Actor = *It;
+			
+			if (!IsValid(Actor) || !Actor->Implements<USaveInterface>()) continue;
+			
+			FSavedActor SavedActor;
+			SavedActor.ActorName = Actor->GetFName();
+			SavedActor.Transform = Actor->GetTransform();
+
+			// serializing SaveGame variables
+			FMemoryWriter MemoryWriter(SavedActor.Bytes);
+			
+			FObjectAndNameAsStringProxyArchive Archive(MemoryWriter, true);
+			Archive.ArIsSaveGame = true;
+
+			Actor->Serialize(Archive);
+
+			SavedMap.Actors.AddUnique(SavedActor);
+		}
+		
+		// MapToReplace& is a non-const ref.
+		// we replace it with the SavedMap that we created and populated earlier
+		for (FSavedMap& MapToReplace : SaveGame->SavedMaps)
+		{
+			if (MapToReplace.MapAssetName == WorldName)
+			{
+				MapToReplace = SavedMap;
+			}
+		}
+		
+		UGameplayStatics::SaveGameToSlot(SaveGame, AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex);
+	}
 }
 
 void AAuraGameModeBase::BeginPlay()

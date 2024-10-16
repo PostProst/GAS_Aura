@@ -17,6 +17,45 @@ enum ESaveSlotStatus
 	Taken
 };
 
+USTRUCT()
+struct FSavedActor
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName ActorName = FName();
+
+	UPROPERTY()
+	FTransform Transform = FTransform();
+
+	// Serialized variables on the actor that are marked as UPROPERTY(SaveGame) specifier
+	UPROPERTY()
+	TArray<uint8> Bytes;
+};
+
+// overloading == operator for FSavedActor type, so we can compare two instances in such functions as AddUnique
+inline bool operator==(const FSavedActor& Left, const FSavedActor& Right)
+{
+	return Left.ActorName == Right.ActorName;
+}
+
+USTRUCT()
+struct FSavedMap
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	FString MapAssetName = FString();
+
+	UPROPERTY()
+	TArray<FSavedActor> Actors;
+};
+
+inline bool operator==(const FSavedMap& Left, const FSavedMap& Right)
+{
+	return Left.MapAssetName.Equals(Right.MapAssetName);
+}
+
 USTRUCT(BlueprintType)
 struct FSavedAbility
 {
@@ -112,6 +151,14 @@ public:
 	
 	UPROPERTY()
 	TArray<FSavedAbility> Abilities;
+
+	/* World State */
+
+	UPROPERTY()
+	TArray<FSavedMap> SavedMaps;
+
+	FSavedMap GetSavedMapWIthMapName(const FString& InMapName);
+	bool HasMap(const FString& InMapName);
 
 protected:
 
