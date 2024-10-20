@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerStart.h"
+#include "Interaction/HighlightInterface.h"
 #include "Interaction/SaveInterface.h"
 #include "Checkpoint.generated.h"
 
@@ -11,7 +12,7 @@
  * 
  */
 UCLASS()
-class AURA_API ACheckpoint : public APlayerStart, public ISaveInterface
+class AURA_API ACheckpoint : public APlayerStart, public ISaveInterface, public IHighlightInterface
 {
 	GENERATED_BODY()
 	
@@ -22,6 +23,11 @@ public:
 	virtual bool ShouldLoadTransform_Implementation() const override {return false;}
 	virtual void LoadActor_Implementation() override;
 	/* end Save Interface */
+
+	/* Highlight Interface */
+	virtual void HighlightActor_Implementation() override;
+	virtual void UnHighlightActor_Implementation() override;
+	/* end Highlight Interface */
 
 	UPROPERTY(SaveGame)
 	bool bReached = false;

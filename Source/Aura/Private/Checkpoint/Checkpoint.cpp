@@ -2,6 +2,7 @@
 
 
 #include "Checkpoint/Checkpoint.h"
+#include "Aura/Aura.h"
 #include "Components/SphereComponent.h"
 #include "Game/AuraGameModeBase.h"
 #include "Interaction/PlayerInterface.h"
@@ -30,6 +31,19 @@ void ACheckpoint::LoadActor_Implementation()
 	{
 		HandleGlowEffect();
 	}
+}
+
+void ACheckpoint::HighlightActor_Implementation()
+{
+	check(CheckpointMesh)
+	CheckpointMesh->SetRenderCustomDepth(true);
+	CheckpointMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_BLUE);
+}
+
+void ACheckpoint::UnHighlightActor_Implementation()
+{
+	check(CheckpointMesh)
+	CheckpointMesh->SetRenderCustomDepth(false);
 }
 
 void ACheckpoint::BeginPlay()
