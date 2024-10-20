@@ -13,10 +13,10 @@
 #include "Aura/Public/Input/AuraInputComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/SplineComponent.h"
-#include "Interaction/EnemyInterface.h"
 #include "GameFramework/Character.h"
 #include "UI/Widget/DamageTextWidgetComponent.h"
 #include "Aura/Aura.h"
+#include "Interaction/HighlightInterface.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -163,7 +163,7 @@ void AAuraPlayerController::CursorTrace()
 
 	// LastActor - is the actor we were hovering over last frame
 	LastActor = ThisActor;
-	ThisActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+	ThisActor = Cast<IHighlightInterface>(CursorHit.GetActor());
 	
 	// if both actors are valid and not the same we do nothing
 	// as well as if they are both null

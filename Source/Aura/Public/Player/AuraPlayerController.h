@@ -7,12 +7,12 @@
 #include "GameplayTagContainer.h"
 #include "AuraPlayerController.generated.h"
 
+class IHighlightInterface;
 class AMagicCircle;
 class UNiagaraSystem;
 class UDamageTextWidgetComponent;
 struct FInputActionValue;
 class UInputAction;
-class IEnemyInterface;
 class UAuraInputComponent;
 class UAuraInputConfig;
 class UAuraAbilitySystemComponent;
@@ -81,8 +81,8 @@ private:
 	
 	FHitResult CursorHit;
 	void CursorTrace();
-	IEnemyInterface* LastActor;
-	IEnemyInterface* ThisActor;
+	IHighlightInterface* LastActor;
+	IHighlightInterface* ThisActor;
 
 	/* Click to move */
 	FVector CachedDestination = FVector::ZeroVector;

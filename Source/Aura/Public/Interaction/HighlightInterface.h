@@ -1,0 +1,28 @@
+// P.S. project
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/Interface.h"
+#include "HighlightInterface.generated.h"
+
+// This class does not need to be modified.
+UINTERFACE(MinimalAPI)
+class UHighlightInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+/**
+ * 
+ */
+class AURA_API IHighlightInterface
+{
+	GENERATED_BODY()
+	
+public:
+	// '=0' marks the function as "pure virtual" which means that it's not defined in the parent class but instead
+	// every class that is derived from this interface must provide a definition for it
+	virtual void HighlightActor() = 0;
+	virtual void UnHighlightActor() = 0;
+};

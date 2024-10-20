@@ -20,12 +20,7 @@ class AURA_API IEnemyInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	// '=0' marks the function as "pure virtual" which means that it's not defined in the parent class but instead
-	// every class that is derived from this interface must provide a definition for it
-	virtual void HighlightActor() = 0;
-	virtual void UnHighlightActor() = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SetCombatTarget(AActor* InCombatTarget);
