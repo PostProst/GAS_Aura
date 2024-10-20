@@ -18,6 +18,14 @@ class UAuraInputConfig;
 class UAuraAbilitySystemComponent;
 class USplineComponent;
 
+
+enum ETargetingStatus
+{
+	TargetingEnemy,
+	TargetingNonEnemy,
+	NotTargeting
+};
+
 /**
  * 
  */
@@ -61,7 +69,7 @@ private:
 	
 	/* Input callbacks */
 	void Move(const FInputActionValue& InputActionValue);
-	
+
 	void CtrlPressed() { bCtrlKeyDown = true; };
 	void CtrlReleased() { bCtrlKeyDown = false; };
 	bool bCtrlKeyDown = false;
@@ -81,15 +89,18 @@ private:
 	
 	FHitResult CursorHit;
 	void CursorTrace();
-	IHighlightInterface* LastActor;
-	IHighlightInterface* ThisActor;
+	// Highlighting actors
+	TObjectPtr<AActor> LastActor;
+	TObjectPtr<AActor> ThisActor;
+	void UnhighlightActor(AActor* InActor);
+	void HighlightActor(AActor* InActor);
 
 	/* Click to move */
 	FVector CachedDestination = FVector::ZeroVector;
 	float FollowTime = 0.f;
 	float ShortPressThreshold = 0.5f;
 	bool bAutoRunning = false;
-	bool bTargeting = false;
+	ETargetingStatus TargetingStatus = NotTargeting;
 
 	void AutoRun();
 

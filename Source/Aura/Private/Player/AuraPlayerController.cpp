@@ -16,6 +16,7 @@
 #include "GameFramework/Character.h"
 #include "UI/Widget/DamageTextWidgetComponent.h"
 #include "Aura/Aura.h"
+#include "Interaction/EnemyInterface.h"
 #include "Interaction/HighlightInterface.h"
 
 AAuraPlayerController::AAuraPlayerController()
@@ -149,8 +150,8 @@ void AAuraPlayerController::CursorTrace()
 	// blocks cursor trace (when performing charged abilities for example)
 	if(GetASC() && GetASC()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.CursorTrace"))))
 	{
-		if (LastActor) LastActor->UnHighlightActor();
-		if (ThisActor) ThisActor->UnHighlightActor();
+		UnhighlightActor(LastActor);
+		UnhighlightActor(ThisActor);
 		LastActor = nullptr;
 		ThisActor = nullptr;
 		return;
@@ -163,20 +164,37 @@ void AAuraPlayerController::CursorTrace()
 
 	// LastActor - is the actor we were hovering over last frame
 	LastActor = ThisActor;
-	ThisActor = Cast<IHighlightInterface>(CursorHit.GetActor());
+	if (IsValid(CursorHit.GetActor()) && CursorHit.GetActor()->Implements<UHighlightInterface>())
+	{
+		ThisActor = CursorHit.GetActor();
+	}
+	else
+	{
+		ThisActor = nullptr;
+	}
 	
 	// if both actors are valid and not the same we do nothing
 	// as well as if they are both null
 	if (LastActor != ThisActor)
 	{
-		if (LastActor != nullptr)
-		{
-			LastActor->UnHighlightActor();
-		}
-		if (ThisActor != nullptr)
-		{
-			ThisActor->HighlightActor();
-		}
+		UnhighlightActor(LastActor);
+		HighlightActor(ThisActor);
+	}
+}
+
+void AAuraPlayerController::HighlightActor(AActor* InActor)
+{
+	if (IsValid(InActor) && InActor->Implements<UHighlightInterface>())
+	{
+		IHighlightInterface::Execute_HighlightActor(InActor);
+	}
+}
+
+void AAuraPlayerController::UnhighlightActor(AActor* InActor)
+{
+	if (IsValid(InActor) && InActor->Implements<UHighlightInterface>())
+	{
+		IHighlightInterface::Execute_UnHighlightActor(InActor);
 	}
 }
 
@@ -189,9 +207,15 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	// if input is LMB (character is running)
 	if (InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
 	{
-		// if ThisActor is not null - set bTargeting to true
-		bTargeting = ThisActor ? true : false;
-		bAutoRunning = false;		
+		if (IsValid(ThisActor))
+		{
+			TargetingStatus = ThisActor->Implements<UEnemyInterface>() ? TargetingEnemy : TargetingNonEnemy;
+			bAutoRunning = false;
+		}
+		else
+		{
+			TargetingStatus = NotTargeting;
+		}
 	}
 	if (GetASC())
 	{
@@ -205,7 +229,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	{
 		return;
 	}
-	// input is not LMB - try activate ability
+	// input is not LMB - try to activate ability
 	if (!InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
 	{
 		if (GetASC())
@@ -221,7 +245,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	}
 	
 	// no target and Ctrl is not pressed - perform click to move
-	if (!bTargeting && !bCtrlKeyDown)
+	if (TargetingStatus != TargetingEnemy && !bCtrlKeyDown)
 	{
 		const APawn* ControlledPawn = GetPawn();
 		// short press, not input hold
@@ -250,7 +274,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 			}
 		}
 		FollowTime = 0.f;
-		bTargeting = false;
+		TargetingStatus = NotTargeting;
 	}
 }
 
@@ -260,7 +284,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	{
 		return;
 	}
-	// input is not LMB - try activate ability
+	// input is not LMB - try to activate ability
 	if (!InputTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("InputTag.LMB"))))
 	{
 		if (GetASC())
@@ -269,8 +293,8 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		}
 		return;
 	}
-	// if there's a target or Ctrl+LMB - try activate ability
-	if (bTargeting || bCtrlKeyDown)
+	// if there's a target or Ctrl+LMB - try to activate ability
+	if (TargetingStatus == TargetingEnemy || bCtrlKeyDown)
 	{
 		if (GetASC())
 		{

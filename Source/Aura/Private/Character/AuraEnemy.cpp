@@ -118,7 +118,7 @@ void AAuraEnemy::InitAbilityActorInfo()
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
 }
 
-void AAuraEnemy::HighlightActor()
+void AAuraEnemy::HighlightActor_Implementation()
 {
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
@@ -127,7 +127,7 @@ void AAuraEnemy::HighlightActor()
 	WeaponMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
 }
 
-void AAuraEnemy::UnHighlightActor()
+void AAuraEnemy::UnHighlightActor_Implementation()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	if (WeaponMesh == nullptr) return;

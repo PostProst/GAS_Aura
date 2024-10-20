@@ -21,8 +21,10 @@ class AURA_API IHighlightInterface
 	GENERATED_BODY()
 	
 public:
-	// '=0' marks the function as "pure virtual" which means that it's not defined in the parent class but instead
-	// every class that is derived from this interface must provide a definition for it
-	virtual void HighlightActor() = 0;
-	virtual void UnHighlightActor() = 0;
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void HighlightActor();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void UnHighlightActor();
 };
