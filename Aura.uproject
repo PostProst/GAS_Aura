@@ -86,6 +86,10 @@
 		{
 			"Name": "AppleMoviePlayer",
 			"Enabled": false
+		},
+		{
+			"Name": "GizmoFramework",
+			"Enabled": true
 		}
 	]
 }
