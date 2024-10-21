@@ -41,9 +41,9 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	}
 	/**
 	 * custom mod magnitude calculation
-	 * base value of 80.f + 2.5 per Vigor + 10.f per Level
+	 * base value of 20.f + 2.5 per Vigor + 10.f per Level
 	 */ 
-	return 80.f + 2.5 * Vigor + 10.f * PlayerLevel;
+	return 20.f + 2.5 * Vigor + 10.f * PlayerLevel;
 
 	
 }
