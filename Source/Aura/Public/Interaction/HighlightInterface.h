@@ -27,4 +27,8 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void UnHighlightActor();
+
+	// returns a special point in space that the player will move to (staircases, entrances etc.)
+	UFUNCTION(BlueprintNativeEvent)
+	bool SetMoveToLocation(FVector& OutLocation);
 };

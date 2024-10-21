@@ -251,6 +251,21 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		// short press, not input hold
 		if (FollowTime <= ShortPressThreshold && ControlledPawn)
 		{
+			// sets MoveToLocation for autorun if we clicked on the object that has a destination point
+			if (IsValid(ThisActor) && ThisActor->Implements<UHighlightInterface>())
+			{
+				FVector Destination;
+				if (IHighlightInterface::Execute_SetMoveToLocation(ThisActor, Destination))
+				{
+					CachedDestination = Destination;	
+				}
+			}
+			// spawn click to move particle effect
+			else if(GetASC() && !GetASC()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputPressed"))))
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+			}
+			
 			// get Navigation Path from the Character to the point under the cursor
 			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
 			{
@@ -267,10 +282,6 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 					CachedDestination = NavPath->PathPoints.Last();
 					bAutoRunning = true;
 				}
-			}
-			if(GetASC() && !GetASC()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.Block.InputPressed"))))
-			{
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
 			}
 		}
 		FollowTime = 0.f;

@@ -27,6 +27,7 @@ public:
 	/*~ HighlightInterface */
 	virtual void HighlightActor_Implementation() override;
 	virtual void UnHighlightActor_Implementation() override;
+	virtual bool SetMoveToLocation_Implementation(FVector& OutLocation) override { return false; }
 	/*~ end HighlightInterface */
 	
 	/*~ EnemyInterface */

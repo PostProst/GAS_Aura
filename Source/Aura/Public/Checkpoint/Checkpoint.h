@@ -27,6 +27,7 @@ public:
 	/* Highlight Interface */
 	virtual void HighlightActor_Implementation() override;
 	virtual void UnHighlightActor_Implementation() override;
+	virtual bool SetMoveToLocation_Implementation(FVector& OutLocation) override;
 	/* end Highlight Interface */
 
 	UPROPERTY(SaveGame)
@@ -50,5 +51,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USphereComponent> OverlapSphere;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> MoveToLocation;
 	
 };

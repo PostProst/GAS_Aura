@@ -16,6 +16,8 @@ ACheckpoint::ACheckpoint(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	CheckpointMesh->SetupAttachment(RootComponent);
 	CheckpointMesh->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
 	CheckpointMesh->SetCollisionResponseToAllChannels(ECR_Block);
+	CheckpointMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_BEIGE);
+	CheckpointMesh->MarkRenderStateDirty();
 	
 	OverlapSphere = CreateDefaultSubobject<USphereComponent>("OverlapSphere");
 	OverlapSphere->SetupAttachment(CheckpointMesh);
@@ -23,6 +25,9 @@ ACheckpoint::ACheckpoint(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	OverlapSphere->SetCollisionEnabled(ECollisionEnabled::Type::QueryOnly);
 	OverlapSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	OverlapSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+	MoveToLocation = CreateDefaultSubobject<USceneComponent>("MoveToLocation");
+	MoveToLocation->SetupAttachment(GetRootComponent());
 }
 
 void ACheckpoint::LoadActor_Implementation()
@@ -35,15 +40,18 @@ void ACheckpoint::LoadActor_Implementation()
 
 void ACheckpoint::HighlightActor_Implementation()
 {
-	check(CheckpointMesh)
 	CheckpointMesh->SetRenderCustomDepth(true);
-	CheckpointMesh->SetCustomDepthStencilValue(CUSTOM_DEPTH_BLUE);
 }
 
 void ACheckpoint::UnHighlightActor_Implementation()
 {
-	check(CheckpointMesh)
 	CheckpointMesh->SetRenderCustomDepth(false);
+}
+
+bool ACheckpoint::SetMoveToLocation_Implementation(FVector& OutLocation)
+{
+	OutLocation = MoveToLocation->GetComponentLocation();
+	return true;
 }
 
 void ACheckpoint::BeginPlay()
