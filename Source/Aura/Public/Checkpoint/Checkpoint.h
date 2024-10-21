@@ -30,7 +30,7 @@ public:
 	virtual bool SetMoveToLocation_Implementation(FVector& OutLocation) override;
 	/* end Highlight Interface */
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, SaveGame)
 	bool bReached = false;
 
 protected:
@@ -42,14 +42,18 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void CheckpointReached(UMaterialInstanceDynamic* DynamicMI);
 
+	UFUNCTION(BlueprintCallable)
 	void HandleGlowEffect();
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bBindOverlapCallback;
 
 private:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> CheckpointMesh;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	TObjectPtr<class USphereComponent> OverlapSphere;
 
 	UPROPERTY(VisibleAnywhere)
