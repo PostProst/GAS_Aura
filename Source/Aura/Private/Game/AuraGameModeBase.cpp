@@ -65,6 +65,18 @@ void AAuraGameModeBase::SaveInGameProgressData(ULoadScreenSaveGame* SaveGameObje
 	UGameplayStatics::SaveGameToSlot(SaveGameObject, InGameLoadSlotName, InGameLoadSlotIndex);
 }
 
+FString AAuraGameModeBase::GetMapNameFromAssetName(const FString& AssetName) const
+{
+	for (auto& MapPair : Maps)
+	{
+		if (MapPair.Value.ToSoftObjectPath().GetAssetName() == AssetName)
+		{
+			return MapPair.Key;
+		}
+	}
+	return FString();
+}
+
 void AAuraGameModeBase::TravelToMap(UMVVM_LoadSlot* Slot)
 {
 	UGameplayStatics::OpenLevelBySoftObjectPtr(Slot, Maps.FindChecked(Slot->GetMapName()));
@@ -97,7 +109,7 @@ AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	return nullptr;
 }
 
-void AAuraGameModeBase::SaveWorldState(UWorld* InWorld) const
+void AAuraGameModeBase::SaveWorldState(UWorld* InWorld, const FString& DestinationMapAssetName) const
 {
 	FString WorldName = InWorld->GetMapName();
 	// removes streaming prefix from the WorldName so we can get the actual asset name
@@ -107,6 +119,12 @@ void AAuraGameModeBase::SaveWorldState(UWorld* InWorld) const
 	check(AuraGameInstance);
 	if (ULoadScreenSaveGame* SaveGame = GetSaveSlotData(AuraGameInstance->LoadSlotName, AuraGameInstance->LoadSlotIndex))
 	{
+		if (!DestinationMapAssetName.IsEmpty())
+		{
+			SaveGame->MapAssetName = DestinationMapAssetName;
+			SaveGame->MapName = GetMapNameFromAssetName(DestinationMapAssetName);
+		}
+		
 		// first time saving this map? - add a new one to the SavedMaps array
 		if (!SaveGame->HasMap(WorldName))
 		{
